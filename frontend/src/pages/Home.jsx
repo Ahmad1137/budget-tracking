@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -19,8 +19,10 @@ function Home() {
     savings: 0
   });
 
+
+
   useEffect(() => {
-    if (!user && shieldRef.current && trustedCompaniesRef.current) {
+    if (shieldRef.current && trustedCompaniesRef.current) {
       const shield = shieldRef.current;
       const target = trustedCompaniesRef.current;
 
@@ -44,14 +46,14 @@ function Home() {
           const targetRect = target.getBoundingClientRect();
           const viewportWidth = window.innerWidth;
           const deltaX = (targetRect.left + targetRect.width/2) - (shieldRect.left + shieldRect.width/2);
-          return viewportWidth < 768 ? deltaX * 1 : deltaX;
+          return viewportWidth < 768 ? deltaX * 0.7 : deltaX;
         },
         y: () => {
           const shieldRect = shield.getBoundingClientRect();
           const targetRect = target.getBoundingClientRect();
           const viewportWidth = window.innerWidth;
           const deltaY = (targetRect.top + targetRect.height/2) - (shieldRect.top + shieldRect.height/2) - 20;
-          return viewportWidth < 768 ? deltaY * 1 : deltaY;
+          return viewportWidth < 768 ? deltaY * 0.8 : deltaY;
         },
         scale: 0.25,
         opacity: 1,
@@ -111,7 +113,7 @@ function Home() {
       observer.disconnect();
       ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     };
-  }, [user]);
+  }, []);
 
   const formatNumber = (num) => {
     if (num >= 1000000) {
@@ -286,7 +288,7 @@ function Home() {
           </motion.div>
 
           {/* Right Shield Icon - 30% */}
-          {!user && (
+          
             <div className="relative flex justify-center items-center h-full mt-8 lg:mt-0">
               <motion.div
                 ref={shieldRef}
@@ -305,7 +307,7 @@ function Home() {
                 </div>
               </motion.div>
             </div>
-          )}
+          
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import { Sun, Moon, Menu, X, Wallet, BarChart3, CreditCard, Target, User, LogOut, FileText } from "lucide-react";
+import { Sun, Moon, Menu, X, Wallet, BarChart3, CreditCard, Target, User, LogOut, FileText, HomeIcon } from "lucide-react";
 
 function Navbar() {
   const { user, logout } = useContext(AuthContext);
@@ -18,6 +18,7 @@ function Navbar() {
   };
 
   const navItems = [
+    { path: "/", label: "Home", icon: HomeIcon },
     { path: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { path: "/transactions", label: "Transactions", icon: CreditCard },
     { path: "/wallets", label: "Wallets", icon: Wallet },
@@ -46,7 +47,7 @@ function Navbar() {
                   <Link
                     key={path}
                     to={path}
-                    className={`flex items-center space-x-1 px-2 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center space-x-1 px-1 py-2 rounded-md text-sm font-medium transition-colors ${
                       location.pathname === path
                         ? "text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400"
                         : "text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400"

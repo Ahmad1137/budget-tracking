@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import ProfilePage from "./pages/ProfilePage";
@@ -25,12 +26,12 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/transactions" element={<TransactionsPage />} />
-                <Route path="/wallets" element={<WalletsPage />} />
-                <Route path="/budgets" element={<BudgetsPage />} />
-                <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="/transactions" element={<ProtectedRoute><TransactionsPage /></ProtectedRoute>} />
+                <Route path="/wallets" element={<ProtectedRoute><WalletsPage /></ProtectedRoute>} />
+                <Route path="/budgets" element={<ProtectedRoute><BudgetsPage /></ProtectedRoute>} />
+                <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
               </Routes>
             </main>
           </div>
