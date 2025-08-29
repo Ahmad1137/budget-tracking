@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../utils/api";
 
-function WalletForm({ onAdd }) {
+function WalletForm({ onAdd, onCancel }) {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -48,12 +48,23 @@ function WalletForm({ onAdd }) {
             className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           ></textarea>
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"
-        >
-          Create Wallet
-        </button>
+        <div className="flex space-x-3">
+          <button
+            type="submit"
+            className="flex-1 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Create Wallet
+          </button>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

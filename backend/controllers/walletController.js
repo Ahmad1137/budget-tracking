@@ -59,4 +59,32 @@ const getWallets = async (req, res) => {
   }
 };
 
-module.exports = { createWallet, joinWallet, getWallets };
+// Delete Wallet
+const deleteWallet = async (req, res) => {
+  try {
+    const wallet = await Wallet.findById(req.params.id);
+    
+    if (!wallet) {
+      return res.status(404).json({ msg: "Wallet not found" });
+    }
+    
+    // Check if user is the owner
+    if (wallet.ownerId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Only the owner can delete this wallet" });
+    }
+    
+    // Remove wallet from all members' wallet arrays
+    await User.updateMany(
+      { _id: { $in: wallet.members } },
+      { $pull: { wallets: wallet._id } }
+    );
+    
+    await Wallet.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Wallet deleted successfully" });
+  } catch (err) {
+    console.error("Delete wallet error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+module.exports = { createWallet, joinWallet, getWallets, deleteWallet };

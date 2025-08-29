@@ -1,203 +1,572 @@
-import { useState, useEffect, useContext } from "react";
-import { useDropzone } from "react-dropzone";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
-import api from "../utils/api";
+import { useState, useContext, useEffect } from "react";
+import { User, Wallet, Target, TrendingUp, Settings, Shield, Bell, Lock, Key, Smartphone, AlertCircle, CheckCircle } from "lucide-react";
+import Profile from "../components/Auth/Profile";
 import { AuthContext } from "../context/AuthContext";
+import api from "../utils/api";
 
-function ProfilePage() {
-  const { user, setUser } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phoneNumber: "",
-    bio: "",
-    profilePicture: null,
+// Security Settings Component
+function SecuritySettings() {
+  const { user } = useContext(AuthContext);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [show2FASetup, setShow2FASetup] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
-  const [imagePreview, setImagePreview] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [twoFactorData, setTwoFactorData] = useState({ secret: '', qrCode: '' });
+  const [verificationCode, setVerificationCode] = useState('');
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(user?.twoFactorEnabled || false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    if (user) {
-      const fetchProfile = async () => {
-        try {
-          const res = await api.get("/api/auth/profile");
-          setFormData({
-            name: res.data.name || "",
-            email: res.data.email || "",
-            phoneNumber: res.data.phoneNumber || "",
-            bio: res.data.bio || "",
-            profilePicture: null,
-          });
-          setImagePreview(res.data.profilePicture || null);
-        } catch (err) {
-          console.error("Profile fetch error:", err);
-          setError("Failed to fetch profile");
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProfile();
-    } else {
+  const generate2FASecret = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const res = await api.get('/api/auth/generate-2fa');
+      setTwoFactorData({
+        secret: res.data.secret,
+        qrCode: res.data.qrCode
+      });
+      setShow2FASetup(true);
+    } catch (err) {
+      setError(err.response?.data?.msg || 'Failed to generate 2FA secret');
+    } finally {
       setLoading(false);
     }
-  }, [user]);
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: { "image/*": [".jpg", ".jpeg", ".png"] },
-    onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (file) {
-        setFormData({ ...formData, profilePicture: file });
-        setImagePreview(URL.createObjectURL(file));
-      }
-    },
-  });
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handlePasswordChange = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    const data = new FormData();
-    data.append("phoneNumber", formData.phoneNumber);
-    data.append("bio", formData.bio);
-    if (formData.profilePicture) {
-      data.append("profilePicture", formData.profilePicture);
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setError('New passwords do not match');
+      return;
     }
-
+    
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    
     try {
-      const res = await api.put("/api/auth/profile", data);
-      setUser(res.data);
-      setImagePreview(res.data.profilePicture || null);
-      setSuccess("Profile updated successfully!");
+      await api.put('/api/auth/change-password', {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword
+      });
+      setSuccess('Password changed successfully');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setShowPasswordForm(false);
     } catch (err) {
-      setError(
-        err.response?.data?.errors?.[0]?.msg || "Failed to update profile"
-      );
+      setError(err.response?.data?.msg || 'Failed to change password');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-xl text-gray-600">Loading...</p>
-      </div>
-    );
-  }
+  const enable2FA = async () => {
+    if (!verificationCode) {
+      setError('Please enter the verification code');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      await api.post('/api/auth/enable-2fa', { token: verificationCode });
+      setTwoFactorEnabled(true);
+      setShow2FASetup(false);
+      setVerificationCode('');
+      setSuccess('Two-factor authentication enabled successfully');
+    } catch (err) {
+      setError(err.response?.data?.msg || 'Invalid verification code');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-xl text-gray-600">
-          Please log in to view your profile
-        </p>
-      </div>
-    );
-  }
+  const disable2FA = async () => {
+    if (!window.confirm('Are you sure you want to disable 2FA?')) return;
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      await api.post('/api/auth/disable-2fa');
+      setTwoFactorEnabled(false);
+      setSuccess('Two-factor authentication disabled');
+    } catch (err) {
+      setError(err.response?.data?.msg || 'Failed to disable 2FA');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center py-12">
-      <div className="max-w-lg w-full bg-white shadow-lg rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          My Profile
-        </h1>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Picture or Icon */}
-          <div className="flex flex-col items-center">
-            {imagePreview ? (
-              <img
-                src={imagePreview}
-                alt="Profile"
-                className="w-32 h-32 rounded-full object-cover border-4 border-blue-100 shadow-md mb-4"
-              />
-            ) : (
-              <UserCircleIcon className="w-32 h-32 text-gray-400 border-4 border-blue-100 rounded-full mb-4" />
-            )}
-            <div
-              {...getRootProps()}
-              className="cursor-pointer text-sm text-blue-600 hover:text-blue-800"
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Security Settings</h3>
+      
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2">
+          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <span className="text-red-700 dark:text-red-400">{error}</span>
+        </div>
+      )}
+      
+      {success && (
+        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center space-x-2">
+          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+          <span className="text-green-700 dark:text-green-400">{success}</span>
+        </div>
+      )}
+      
+      <div className="space-y-6">
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Lock className="h-5 w-5 text-gray-400" />
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 dark:text-white">Password</h4>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">Keep your account secure</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowPasswordForm(!showPasswordForm)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
-              <input {...getInputProps()} />
-              <p>Upload new profile picture (JPG/PNG)</p>
+              Change Password
+            </button>
+          </div>
+          
+          {showPasswordForm && (
+            <form onSubmit={handlePasswordChange} className="mt-4 space-y-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <input
+                type="password"
+                placeholder="Current Password"
+                value={passwordForm.currentPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                required
+              />
+              <input
+                type="password"
+                placeholder="New Password"
+                value={passwordForm.newPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                required
+                minLength={8}
+              />
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                required
+              />
+              <div className="flex space-x-3">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  {loading ? 'Updating...' : 'Update Password'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordForm(false)}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+        
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Smartphone className="h-5 w-5 text-gray-400" />
+              <div>
+                <h4 className="text-lg font-medium text-gray-900 dark:text-white">Two-Factor Authentication</h4>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  {twoFactorEnabled ? 'Your account is protected with Google Authenticator' : 'Secure your account with Google Authenticator'}
+                </p>
+              </div>
+            </div>
+            {twoFactorEnabled ? (
+              <button
+                onClick={disable2FA}
+                disabled={loading}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+              >
+                {loading ? 'Processing...' : 'Disable 2FA'}
+              </button>
+            ) : (
+              <button
+                onClick={generate2FASecret}
+                disabled={loading}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white rounded-lg transition-colors"
+              >
+                {loading ? 'Generating...' : 'Setup 2FA'}
+              </button>
+            )}
+          </div>
+          
+          {show2FASetup && (
+            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <h5 className="font-medium text-gray-900 dark:text-white mb-4">Setup Google Authenticator</h5>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    1. Install Google Authenticator on your phone
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    2. Scan this QR code with the app:
+                  </p>
+                  {twoFactorData.qrCode && (
+                    <img 
+                      src={twoFactorData.qrCode} 
+                      alt="QR Code" 
+                      className="mx-auto mb-4 border rounded-lg"
+                    />
+                  )}
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                    Or enter this secret manually: <code className="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-xs">{twoFactorData.secret}</code>
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    3. Enter the 6-digit code from your app:
+                  </label>
+                  <input
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center text-xl tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                  />
+                </div>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={enable2FA}
+                    disabled={loading || !verificationCode}
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    {loading ? 'Verifying...' : 'Enable 2FA'}
+                  </button>
+                  <button
+                    onClick={() => setShow2FASetup(false)}
+                    className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <div>
+          <div className="flex items-center space-x-3 mb-4">
+            <Key className="h-5 w-5 text-gray-400" />
+            <div>
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white">Active Sessions</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">Current login session</p>
             </div>
           </div>
-
-          {/* Name (Read-only) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              readOnly
-              className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-            />
+          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-medium text-gray-900 dark:text-white">Current Session</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Active now</p>
+              </div>
+              <span className="text-green-600 dark:text-green-400 text-sm font-medium px-2 py-1 bg-green-100 dark:bg-green-900/20 rounded">
+                Current
+              </span>
+            </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-          {/* Email (Read-only) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              readOnly
-              className="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
-            />
+function ProfilePage() {
+  const { user } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState("profile");
+  const [stats, setStats] = useState({
+    totalWallets: 0,
+    totalBudgets: 0,
+    totalTransactions: 0,
+    monthlySpending: 0
+  });
+  const [preferences, setPreferences] = useState({
+    notifications: true,
+    darkMode: false,
+    currency: "USD",
+    language: "en"
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUserStats();
+  }, []);
+
+  const fetchUserStats = async () => {
+    try {
+      const [walletsRes, budgetsRes, transactionsRes] = await Promise.all([
+        api.get("/api/wallets"),
+        api.get(`/api/budgets?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`),
+        api.get("/api/transactions")
+      ]);
+      
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      const monthlyTransactions = transactionsRes.data.filter(t => {
+        const transactionDate = new Date(t.date);
+        return transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear;
+      });
+      
+      setStats({
+        totalWallets: walletsRes.data.length,
+        totalBudgets: budgetsRes.data.length,
+        totalTransactions: transactionsRes.data.length,
+        monthlySpending: monthlyTransactions.reduce((sum, t) => sum + (t.type === 'expense' ? t.amount : 0), 0)
+      });
+    } catch (err) {
+      console.error("Failed to fetch user stats:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePreferenceChange = async (key, value) => {
+    try {
+      setPreferences(prev => ({ ...prev, [key]: value }));
+      // API call to save preferences would go here
+      await api.put("/api/auth/preferences", { [key]: value });
+    } catch (err) {
+      console.error("Failed to update preferences:", err);
+    }
+  };
+
+  const tabs = [
+    { id: "profile", label: "Profile", icon: User },
+    { id: "stats", label: "Statistics", icon: TrendingUp },
+    { id: "settings", label: "Settings", icon: Settings },
+    { id: "security", label: "Security", icon: Shield }
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "profile":
+        return <Profile />;
+      
+      case "stats":
+        return (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Your Statistics</h3>
+            
+            {loading ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Wallets</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalWallets}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Active Budgets</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBudgets}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Transactions</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalTransactions}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-8 w-8 bg-orange-600 dark:bg-orange-400 rounded-full flex items-center justify-center text-white font-bold">$</div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">This Month's Spending</p>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.monthlySpending}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div className="mt-8">
+              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Account Overview</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600 dark:text-gray-400">Member since</span>
+                  <span className="text-gray-900 dark:text-white font-medium">
+                    {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    }) : new Date().toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600 dark:text-gray-400">Account status</span>
+                  <span className="text-green-600 dark:text-green-400 font-medium">✓ Active</span>
+                </div>
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600 dark:text-gray-400">Profile completion</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-medium">85%</span>
+                </div>
+              </div>
+            </div>
           </div>
-
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="+12345678901"
-            />
+        );
+      
+      case "settings":
+        return (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Preferences</h3>
+            
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Bell className="h-5 w-5 text-gray-400" />
+                  <div>
+                    <p className="text-gray-900 dark:text-white font-medium">Notifications</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive email notifications</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={preferences.notifications}
+                    onChange={(e) => handlePreferenceChange('notifications', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Currency</label>
+                <select
+                  value={preferences.currency}
+                  onChange={(e) => handlePreferenceChange('currency', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="USD">USD ($) - US Dollar</option>
+                  <option value="EUR">EUR (€) - Euro</option>
+                  <option value="GBP">GBP (£) - British Pound</option>
+                  <option value="JPY">JPY (¥) - Japanese Yen</option>
+                  <option value="CAD">CAD ($) - Canadian Dollar</option>
+                  <option value="AUD">AUD ($) - Australian Dollar</option>
+                  <option value="CHF">CHF - Swiss Franc</option>
+                  <option value="CNY">CNY (¥) - Chinese Yuan</option>
+                  <option value="INR">INR (₹) - Indian Rupee</option>
+                  <option value="KRW">KRW (₩) - South Korean Won</option>
+                  <option value="BRL">BRL (R$) - Brazilian Real</option>
+                  <option value="MXN">MXN ($) - Mexican Peso</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language</label>
+                <select
+                  value={preferences.language}
+                  onChange={(e) => handlePreferenceChange('language', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Español (Spanish)</option>
+                  <option value="fr">Français (French)</option>
+                  <option value="de">Deutsch (German)</option>
+                  <option value="it">Italiano (Italian)</option>
+                  <option value="pt">Português (Portuguese)</option>
+                  <option value="ru">Русский (Russian)</option>
+                  <option value="ja">日本語 (Japanese)</option>
+                  <option value="ko">한국어 (Korean)</option>
+                  <option value="zh">中文 (Chinese)</option>
+                  <option value="ar">العربية (Arabic)</option>
+                  <option value="hi">हिन्दी (Hindi)</option>
+                </select>
+              </div>
+            </div>
           </div>
+        );
+      
+      case "security":
+        return (
+          <SecuritySettings />
+        );
+      
+      default:
+        return null;
+    }
+  };
 
-          {/* Bio */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bio
-            </label>
-            <textarea
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows="4"
-              placeholder="Tell us about yourself"
-            />
-          </div>
-
-          {/* Messages */}
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          {success && (
-            <p className="text-green-500 text-sm text-center">{success}</p>
-          )}
-
-          {/* Save Button */}
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white p-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-          >
-            Save Changes
-          </button>
-        </form>
+  return (
+    <div className="container mx-auto mt-6 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Account Settings</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your profile, preferences, and security settings</p>
+        </div>
+        
+        {/* Tabs */}
+        <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700 mb-8">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center space-x-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
+                  activeTab === tab.id
+                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+        
+        {/* Tab Content */}
+        <div className="mb-8">
+          {renderTabContent()}
+        </div>
       </div>
     </div>
   );

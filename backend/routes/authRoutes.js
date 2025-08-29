@@ -4,6 +4,13 @@ const {
   loginUser,
   updateProfile,
   getProfile,
+  updatePreferences,
+  changePassword,
+  generate2FA,
+  enable2FA,
+  disable2FA,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
 const { body } = require("express-validator");
@@ -13,13 +20,29 @@ const router = express.Router();
 router.post(
   "/register",
   [
-    body("name").notEmpty().withMessage("Name is required"),
-    body("email").isEmail().withMessage("Valid email is required"),
+    body("name")
+      .trim()
+      .isLength({ min: 2, max: 50 })
+      .withMessage("Name must be between 2 and 50 characters")
+      .matches(/^[a-zA-Z\s]+$/)
+      .withMessage("Name can only contain letters and spaces"),
+    body("email")
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("Please enter a valid email address"),
     body("password")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters"),
-    body("phoneNumber").notEmpty().withMessage("Phone number is required"), // Changed to required to match model
-    body("bio").optional().isString().withMessage("Bio must be a string"),
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long")
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/)
+      .withMessage("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
+    body("phoneNumber")
+      .optional({ checkFalsy: true })
+      .matches(/^\+?[\d\s\-\(\)]{10,}$/)
+      .withMessage("Please enter a valid phone number"),
+    body("bio")
+      .optional()
+      .isLength({ max: 500 })
+      .withMessage("Bio cannot exceed 500 characters"),
   ],
   registerUser
 );
@@ -27,8 +50,13 @@ router.post(
 router.post(
   "/login",
   [
-    body("email").isEmail().withMessage("Valid email is required"),
-    body("password").exists().withMessage("Password is required"),
+    body("email")
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("Please enter a valid email address"),
+    body("password")
+      .notEmpty()
+      .withMessage("Password is required"),
   ],
   loginUser
 );
@@ -38,14 +66,24 @@ router.put(
   protect,
   [
     body("phoneNumber")
+      .optional({ checkFalsy: true })
+      .matches(/^\+?[\d\s\-\(\)]{10,}$/)
+      .withMessage("Please enter a valid phone number"),
+    body("bio")
       .optional()
-      .matches(/^\+\d{7,15}$/)
-      .withMessage("Phone number must start with + followed by 7-15 digits"),
-    body("bio").optional().isString().withMessage("Bio must be a string"),
+      .isLength({ max: 500 })
+      .withMessage("Bio cannot exceed 500 characters"),
   ],
   updateProfile
 );
 
 router.get("/profile", protect, getProfile);
+router.put("/preferences", protect, updatePreferences);
+router.put("/change-password", protect, changePassword);
+router.get("/generate-2fa", protect, generate2FA);
+router.post("/enable-2fa", protect, enable2FA);
+router.post("/disable-2fa", protect, disable2FA);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
 module.exports = router;

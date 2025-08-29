@@ -84,4 +84,26 @@ const getBudgets = async (req, res) => {
   }
 };
 
-module.exports = { setBudget, getBudgets };
+// Delete Budget
+const deleteBudget = async (req, res) => {
+  try {
+    const budget = await Budget.findById(req.params.id);
+    
+    if (!budget) {
+      return res.status(404).json({ msg: "Budget not found" });
+    }
+    
+    // Check if user owns the budget
+    if (budget.userId.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Not authorized" });
+    }
+    
+    await Budget.findByIdAndDelete(req.params.id);
+    res.json({ msg: "Budget deleted successfully" });
+  } catch (err) {
+    console.error("Delete budget error:", err);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+module.exports = { setBudget, getBudgets, deleteBudget };

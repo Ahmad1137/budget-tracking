@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../../utils/api";
 
-function BudgetForm({ wallets, onAdd }) {
+function BudgetForm({ wallets, onAdd, onCancel }) {
   const [formData, setFormData] = useState({
     category: "",
     amount: "",
@@ -101,12 +101,23 @@ function BudgetForm({ wallets, onAdd }) {
             </select>
           </div>
         )}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"
-        >
-          Set Budget
-        </button>
+        <div className="flex space-x-3">
+          <button
+            type="submit"
+            className="flex-1 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Set Budget
+          </button>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="flex-1 bg-gray-500 text-white p-2 rounded-md hover:bg-gray-600 transition-colors"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
     </div>
   );

@@ -28,15 +28,27 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const res = await api.post("/api/auth/login", { email, password });
     localStorage.setItem("token", res.data.token);
-    const profile = await api.get("/api/auth/profile");
-    setUser(profile.data);
+    
+    // Use user data from login response if available, otherwise fetch profile
+    if (res.data.user) {
+      setUser(res.data.user);
+    } else {
+      const profile = await api.get("/api/auth/profile");
+      setUser(profile.data);
+    }
   };
 
   const register = async (data) => {
     const res = await api.post("/api/auth/register", data);
     localStorage.setItem("token", res.data.token);
-    const profile = await api.get("/api/auth/profile");
-    setUser(profile.data);
+    
+    // Use user data from register response if available, otherwise fetch profile
+    if (res.data.user) {
+      setUser(res.data.user);
+    } else {
+      const profile = await api.get("/api/auth/profile");
+      setUser(profile.data);
+    }
   };
 
   const logout = () => {
