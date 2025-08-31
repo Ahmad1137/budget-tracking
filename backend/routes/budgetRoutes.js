@@ -1,5 +1,10 @@
 const express = require("express");
-const { setBudget, getBudgets, deleteBudget } = require("../controllers/budgetController");
+const {
+  setBudget,
+  getBudgets,
+  deleteBudget,
+} = require("../controllers/budgetController");
+const { getBudgetSuggestion } = require("../controllers/aiController");
 const { protect } = require("../middleware/authMiddleware");
 const { body } = require("express-validator");
 
@@ -23,5 +28,6 @@ router.post(
 
 router.get("/", protect, getBudgets);
 router.delete("/:id", protect, deleteBudget);
+router.get("/suggestion", protect, getBudgetSuggestion);
 
 module.exports = router;

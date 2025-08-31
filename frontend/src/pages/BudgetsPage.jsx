@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Search, Filter, Plus, TrendingUp, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Plus,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle,
+} from "lucide-react";
 import api from "../utils/api";
 import BudgetForm from "../components/Budgets/BudgetForm";
 import BudgetList from "../components/Budgets/BudgetList";
@@ -15,8 +22,11 @@ function BudgetsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState({
     year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1
+    month: new Date().getMonth() + 1,
   });
+  const [aiSuggestion, setAiSuggestion] = useState(""); // New state for AI suggestion
+  const [aiLoading, setAiLoading] = useState(false); // New state for AI loading
+  const [aiError, setAiError] = useState(""); // New state for AI errors
 
   useEffect(() => {
     fetchData();
@@ -30,7 +40,9 @@ function BudgetsPage() {
     setLoading(true);
     try {
       const [budgetsRes, walletsRes] = await Promise.all([
-        api.get(`/api/budgets?year=${selectedPeriod.year}&month=${selectedPeriod.month}`),
+        api.get(
+          `/api/budgets?year=${selectedPeriod.year}&month=${selectedPeriod.month}`
+        ),
         api.get("/api/wallets"),
       ]);
       setBudgets(budgetsRes.data);
@@ -43,15 +55,17 @@ function BudgetsPage() {
   };
 
   const filterBudgets = () => {
-    let filtered = budgets.filter(budget => 
+    let filtered = budgets.filter((budget) =>
       budget.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (filterStatus !== "all") {
-      filtered = filtered.filter(budget => {
+      filtered = filtered.filter((budget) => {
         if (filterStatus === "over") return budget.overBudget;
-        if (filterStatus === "warning") return !budget.overBudget && (budget.spent / budget.amount) > 0.8;
-        if (filterStatus === "good") return !budget.overBudget && (budget.spent / budget.amount) <= 0.8;
+        if (filterStatus === "warning")
+          return !budget.overBudget && budget.spent / budget.amount > 0.8;
+        if (filterStatus === "good")
+          return !budget.overBudget && budget.spent / budget.amount <= 0.8;
         return true;
       });
     }
@@ -66,16 +80,32 @@ function BudgetsPage() {
 
   const getBudgetStats = () => {
     const total = budgets.length;
-    const overBudget = budgets.filter(b => b.overBudget).length;
-    const warning = budgets.filter(b => !b.overBudget && (b.spent / b.amount) > 0.8).length;
+    const overBudget = budgets.filter((b) => b.overBudget).length;
+    const warning = budgets.filter(
+      (b) => !b.overBudget && b.spent / b.amount > 0.8
+    ).length;
     const good = total - overBudget - warning;
     const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
     const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
-    
+
     return { total, overBudget, warning, good, totalBudget, totalSpent };
   };
 
   const stats = getBudgetStats();
+
+  const fetchAiSuggestion = async () => {
+    setAiLoading(true);
+    setAiError("");
+    try {
+      const res = await api.get("/api/budgets/suggestion");
+      setAiSuggestion(res.data.suggestion);
+    } catch (err) {
+      setAiError("Failed to get AI suggestion");
+      console.error(err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -90,18 +120,37 @@ function BudgetsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Budget Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Budget Management
+          </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            {new Date(selectedPeriod.year, selectedPeriod.month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            {new Date(
+              selectedPeriod.year,
+              selectedPeriod.month - 1
+            ).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
           </p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New Budget</span>
-        </button>
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Budget</span>
+          </button>
+          <button
+            onClick={fetchAiSuggestion}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+            disabled={aiLoading}
+          >
+            {aiLoading ? (
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+            ) : (
+              <CheckCircle className="h-4 w-4" />
+            )}
+            <span>Get AI Advice</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -109,8 +158,12 @@ function BudgetsPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Budgets</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Budgets
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {stats.total}
+              </p>
             </div>
             <TrendingUp className="h-8 w-8 text-blue-500" />
           </div>
@@ -118,8 +171,12 @@ function BudgetsPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Over Budget</p>
-              <p className="text-2xl font-bold text-red-600">{stats.overBudget}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Over Budget
+              </p>
+              <p className="text-2xl font-bold text-red-600">
+                {stats.overBudget}
+              </p>
             </div>
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
@@ -127,8 +184,12 @@ function BudgetsPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Budget</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.totalBudget}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Budget
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${stats.totalBudget}
+              </p>
             </div>
             <div className="text-green-500 text-sm">Budget</div>
           </div>
@@ -136,8 +197,12 @@ function BudgetsPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.totalSpent}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Spent
+              </p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                ${stats.totalSpent}
+              </p>
             </div>
             <div className="text-blue-500 text-sm">Spent</div>
           </div>
@@ -148,27 +213,45 @@ function BudgetsPage() {
       <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Year</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Year
+            </label>
             <select
               value={selectedPeriod.year}
-              onChange={(e) => setSelectedPeriod({...selectedPeriod, year: parseInt(e.target.value)})}
+              onChange={(e) =>
+                setSelectedPeriod({
+                  ...selectedPeriod,
+                  year: parseInt(e.target.value),
+                })
+              }
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              {[2023, 2024, 2025, 2026].map(year => (
-                <option key={year} value={year}>{year}</option>
+              {[2023, 2024, 2025, 2026].map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Month</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Month
+            </label>
             <select
               value={selectedPeriod.month}
-              onChange={(e) => setSelectedPeriod({...selectedPeriod, month: parseInt(e.target.value)})}
+              onChange={(e) =>
+                setSelectedPeriod({
+                  ...selectedPeriod,
+                  month: parseInt(e.target.value),
+                })
+              }
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              {Array.from({length: 12}, (_, i) => i + 1).map(month => (
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <option key={month} value={month}>
-                  {new Date(2024, month - 1).toLocaleDateString('en-US', { month: 'long' })}
+                  {new Date(2024, month - 1).toLocaleDateString("en-US", {
+                    month: "long",
+                  })}
                 </option>
               ))}
             </select>
@@ -179,7 +262,11 @@ function BudgetsPage() {
       {/* Budget Form */}
       {showForm && (
         <div className="mb-8">
-          <BudgetForm wallets={wallets} onAdd={handleAdd} onCancel={() => setShowForm(false)} />
+          <BudgetForm
+            wallets={wallets}
+            onAdd={handleAdd}
+            onCancel={() => setShowForm(false)}
+          />
         </div>
       )}
 
@@ -220,6 +307,31 @@ function BudgetsPage() {
         <div className="lg:col-span-1">
           <BudgetChart budgets={budgets} />
         </div>
+      </div>
+
+      {/* AI Suggestion Card */}
+      <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          AI Budget Suggestions
+        </h3>
+        <button
+          onClick={fetchAiSuggestion}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors mb-4"
+          disabled={aiLoading}
+        >
+          {aiLoading ? (
+            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+          ) : (
+            <CheckCircle className="h-4 w-4" />
+          )}
+          <span>Get AI Advice</span>
+        </button>
+        {aiError && <p className="text-red-500 text-sm mb-2">{aiError}</p>}
+        {aiSuggestion && (
+          <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            {aiSuggestion}
+          </div>
+        )}
       </div>
     </div>
   );
