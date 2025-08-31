@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { DollarSign, Tag, FileText, Calendar, Wallet, AlertCircle, CheckCircle, Sparkles } from "lucide-react";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
+import { generateTransactionDescription } from "../../services/geminiService";
 
 function TransactionForm({ wallets, budgets = [], onAdd }) {
   const { user } = useContext(AuthContext);
@@ -22,37 +23,23 @@ function TransactionForm({ wallets, budgets = [], onAdd }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const generateAiDescription = () => {
+  const generateAiDescription = async () => {
     if (!formData.category || !formData.amount) return;
     
     setAiLoading(true);
     
-    // Simulate AI description generation
-    setTimeout(() => {
-      const descriptions = {
-        'Food': [`Meal at restaurant $${formData.amount}`, `Grocery shopping for essentials`, `Coffee and snacks purchase`, `Lunch with colleagues today`],
-        'Transportation': [`Gas station fill-up $${formData.amount}`, `Public transport monthly pass`, `Taxi ride to destination`, `Car maintenance and service`],
-        'Entertainment': [`Movie tickets and popcorn`, `Concert tickets for tonight`, `Gaming subscription renewal`, `Books and magazines purchase`],
-        'Shopping': [`Clothing and accessories purchase`, `Electronics and gadgets buy`, `Home improvement items`, `Personal care products`],
-        'Bills': [`Monthly utility bill payment`, `Internet and phone service`, `Insurance premium payment`, `Subscription service renewal`],
-        'Healthcare': [`Doctor visit and consultation`, `Pharmacy medication purchase`, `Dental checkup and cleaning`, `Health insurance copay`],
-        'Salary': [`Monthly salary deposit received`, `Bonus payment from employer`, `Overtime compensation earned`, `Performance incentive payment`],
-        'Freelance': [`Client project payment received`, `Consulting work compensation`, `Design work payment`, `Writing assignment fee`],
-        'Investment': [`Dividend payment received today`, `Stock sale profit`, `Bond interest payment`, `Mutual fund returns`],
-        'Gift': [`Birthday gift money received`, `Holiday cash gift`, `Wedding gift from family`, `Graduation money gift`],
-        'Other': [`Miscellaneous transaction for $${formData.amount}`, `General expense payment`, `Uncategorized financial activity`, `Other income or expense`]
-      };
-      
-      const categoryDescriptions = descriptions[formData.category] || descriptions['Other'];
-      const randomDescription = categoryDescriptions[Math.floor(Math.random() * categoryDescriptions.length)];
-      
-      // Limit to 10 words
-      const words = randomDescription.split(' ');
-      const limitedDescription = words.slice(0, 10).join(' ');
-      
-      setFormData(prev => ({ ...prev, description: limitedDescription }));
+    try {
+      const description = await generateTransactionDescription(
+        formData.type,
+        formData.category,
+        formData.amount
+      );
+      setFormData(prev => ({ ...prev, description }));
+    } catch (error) {
+      console.error('Failed to generate AI description:', error);
+    } finally {
       setAiLoading(false);
-    }, 1000);
+    }
   };
 
   useEffect(() => {

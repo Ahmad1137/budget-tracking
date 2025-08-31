@@ -256,7 +256,7 @@ function SecuritySettings() {
                   <button
                     onClick={enable2FA}
                     disabled={loading || !verificationCode}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-4 py-2 rounded-lg transition-colors"
+                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-green-300 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     {loading ? 'Verifying...' : 'Enable 2FA'}
                   </button>
