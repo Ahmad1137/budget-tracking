@@ -79,11 +79,38 @@ router.put(
 
 router.get("/profile", protect, getProfile);
 router.put("/preferences", protect, updatePreferences);
-router.put("/change-password", protect, changePassword);
+router.put(
+  "/change-password",
+  protect,
+  [
+    body("newPassword")
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long")
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/)
+      .withMessage("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
+    body("currentPassword")
+      .notEmpty()
+      .withMessage("Current password is required"),
+  ],
+  changePassword
+);
 router.get("/generate-2fa", protect, generate2FA);
 router.post("/enable-2fa", protect, enable2FA);
 router.post("/disable-2fa", protect, disable2FA);
 router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+router.post(
+  "/reset-password",
+  [
+    body("password")
+      .isLength({ min: 8 })
+      .withMessage("Password must be at least 8 characters long")
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/)
+      .withMessage("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
+    body("token")
+      .notEmpty()
+      .withMessage("Reset token is required"),
+  ],
+  resetPassword
+);
 
 module.exports = router;

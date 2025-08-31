@@ -1,9 +1,11 @@
 import { Target, AlertTriangle, CheckCircle, DollarSign, Edit, Trash2, MoreVertical } from "lucide-react";
 import { useState } from "react";
 import api from "../../utils/api";
+import BudgetForm from "./BudgetForm";
 
 function BudgetList({ budgets, onUpdate }) {
   const [deletingId, setDeletingId] = useState(null);
+  const [editingBudget, setEditingBudget] = useState(null);
   const handleDelete = async (budgetId) => {
     if (window.confirm('Are you sure you want to delete this budget?')) {
       setDeletingId(budgetId);
@@ -74,7 +76,10 @@ function BudgetList({ budgets, onUpdate }) {
                   </span>
                 )}
                 <div className="flex space-x-1">
-                  <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-blue-600 dark:text-blue-400">
+                  <button 
+                    onClick={() => setEditingBudget(budget)}
+                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-blue-600 dark:text-blue-400"
+                  >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button 
@@ -140,6 +145,24 @@ function BudgetList({ budgets, onUpdate }) {
           </div>
         );
       })}
+      
+      {/* Edit Budget Modal */}
+      {editingBudget && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Edit Budget</h3>
+            <BudgetForm 
+              budget={editingBudget}
+              wallets={[]}
+              onAdd={(updatedBudget) => {
+                setEditingBudget(null);
+                onUpdate && onUpdate();
+              }}
+              onCancel={() => setEditingBudget(null)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

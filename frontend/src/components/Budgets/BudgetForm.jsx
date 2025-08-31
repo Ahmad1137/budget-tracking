@@ -1,13 +1,13 @@
 import { useState } from "react";
 import api from "../../utils/api";
 
-function BudgetForm({ wallets, onAdd, onCancel }) {
+function BudgetForm({ wallets, budget, onAdd, onCancel }) {
   const [formData, setFormData] = useState({
-    category: "",
-    amount: "",
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
-    walletId: "",
+    category: budget?.category || "",
+    amount: budget?.amount || "",
+    year: budget?.year || new Date().getFullYear(),
+    month: budget?.month || new Date().getMonth() + 1,
+    walletId: budget?.walletId || "",
   });
   const [error, setError] = useState("");
 
@@ -18,23 +18,30 @@ function BudgetForm({ wallets, onAdd, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/api/budgets", formData);
+      let res;
+      if (budget) {
+        res = await api.put(`/api/budgets/${budget._id}`, formData);
+      } else {
+        res = await api.post("/api/budgets", formData);
+      }
       onAdd(res.data);
-      setFormData({
-        category: "",
-        amount: "",
-        year: new Date().getFullYear(),
-        month: new Date().getMonth() + 1,
-        walletId: "",
-      });
+      if (!budget) {
+        setFormData({
+          category: "",
+          amount: "",
+          year: new Date().getFullYear(),
+          month: new Date().getMonth() + 1,
+          walletId: "",
+        });
+      }
     } catch (err) {
-      setError(err.response?.data?.msg || "Failed to set budget");
+      setError(err.response?.data?.msg || `Failed to ${budget ? 'update' : 'set'} budget`);
     }
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Set Budget</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">{budget ? 'Edit Budget' : 'Set Budget'}</h2>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -83,7 +90,7 @@ function BudgetForm({ wallets, onAdd, onCancel }) {
             required
           />
         </div>
-        {wallets.length > 0 && (
+        {wallets && wallets.length > 0 && (
           <div>
             <label className="block text-sm font-medium">Wallet</label>
             <select
@@ -93,7 +100,7 @@ function BudgetForm({ wallets, onAdd, onCancel }) {
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Personal</option>
-              {wallets.map((wallet) => (
+              {wallets && wallets.map((wallet) => (
                 <option key={wallet._id} value={wallet._id}>
                   {wallet.name}
                 </option>
@@ -106,7 +113,7 @@ function BudgetForm({ wallets, onAdd, onCancel }) {
             type="submit"
             className="flex-1 bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors"
           >
-            Set Budget
+            {budget ? 'Update Budget' : 'Set Budget'}
           </button>
           {onCancel && (
             <button

@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { TrendingUp, TrendingDown, DollarSign, Wallet, Plus, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import api from "../utils/api";
 import { AuthContext } from "../context/AuthContext";
-import TransactionChart from "../components/Transactions/TransactionChart";
-import BudgetChart from "../components/Budgets/BudgetChart";
+import BudgetSpendingChart from "../components/Charts/BudgetSpendingChart";
+import MonthlyTransactionChart from "../components/Charts/MonthlyTransactionChart";
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -15,10 +15,11 @@ function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await api.get("/api/transactions/charts?period=month");
-        const income = res.data.find((d) => d._id.type === "income")?.total || 0;
-        const expense = res.data.find((d) => d._id.type === "expense")?.total || 0;
-        setStats({ totalIncome: income, totalExpense: expense });
+        const res = await api.get("/api/transactions");
+        const transactions = res.data;
+        const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+        const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        setStats({ totalIncome, totalExpense });
       } catch (err) {
         console.error(err);
       } finally {
@@ -118,10 +119,12 @@ function Dashboard() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <TransactionChart />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Income vs Expenses</h3>
+          <BudgetSpendingChart />
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <BudgetChart />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Balance</h3>
+          <MonthlyTransactionChart />
         </div>
       </div>
 

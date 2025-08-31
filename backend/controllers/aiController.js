@@ -25,7 +25,7 @@ const getBudgetSuggestion = async (req, res) => {
 
     // AI Prompt: Generate budget suggestions
     const prompt = `
-      You are a financial advisor. Based on the following transaction history, suggest a monthly budget breakdown by category (e.g., Food: $200, Transport: $100). Also, provide 2-3 tips to save money. Keep response concise (under 200 words).
+      You are a financial advisor. Based on the following transaction history, suggest a monthly budget breakdown by category (e.g., Food: $200, Transport: $100). Also, provide 2-3 tips to save money. Keep response concise (under 200 words) and don't write bold.
 
       Transactions:
       ${transactionSummary || "No recent transactions."}

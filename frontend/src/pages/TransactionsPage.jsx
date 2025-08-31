@@ -1,24 +1,37 @@
 import { useEffect, useState } from "react";
-import { CreditCard, Plus } from "lucide-react";
+import { CreditCard, Plus, Search, Filter, SortAsc, SortDesc } from "lucide-react";
 import api from "../utils/api";
 import TransactionForm from "../components/Transactions/TransactionForm";
 import TransactionList from "../components/Transactions/TransactionList";
 
 function TransactionsPage() {
   const [transactions, setTransactions] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [wallets, setWallets] = useState([]);
+  const [budgets, setBudgets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [filters, setFilters] = useState({
+    search: '',
+    type: 'all',
+    category: 'all',
+    dateFrom: '',
+    dateTo: '',
+    sortBy: 'date',
+    sortOrder: 'desc'
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [transRes, walletsRes] = await Promise.all([
+        const [transRes, walletsRes, budgetsRes] = await Promise.all([
           api.get("/api/transactions"),
           api.get("/api/wallets"),
+          api.get("/api/budgets"),
         ]);
         setTransactions(transRes.data);
         setWallets(walletsRes.data);
+        setBudgets(budgetsRes.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -28,6 +41,10 @@ function TransactionsPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    filterAndSortTransactions();
+  }, [transactions, filters]);
+
   const handleAdd = (transaction) => {
     setTransactions([transaction, ...transactions]);
     setShowForm(false);
@@ -35,6 +52,66 @@ function TransactionsPage() {
 
   const handleDelete = (id) => {
     setTransactions(transactions.filter((t) => t._id !== id));
+  };
+
+  const filterAndSortTransactions = () => {
+    let filtered = [...transactions];
+
+    if (filters.search) {
+      filtered = filtered.filter(t => 
+        t.description?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        t.category.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
+
+    if (filters.type !== 'all') {
+      filtered = filtered.filter(t => t.type === filters.type);
+    }
+
+    if (filters.category !== 'all') {
+      filtered = filtered.filter(t => t.category === filters.category);
+    }
+
+    if (filters.dateFrom) {
+      filtered = filtered.filter(t => new Date(t.date) >= new Date(filters.dateFrom));
+    }
+    if (filters.dateTo) {
+      filtered = filtered.filter(t => new Date(t.date) <= new Date(filters.dateTo));
+    }
+
+    filtered.sort((a, b) => {
+      let aVal, bVal;
+      switch (filters.sortBy) {
+        case 'amount':
+          aVal = a.amount;
+          bVal = b.amount;
+          break;
+        case 'category':
+          aVal = a.category;
+          bVal = b.category;
+          break;
+        default:
+          aVal = new Date(a.date);
+          bVal = new Date(b.date);
+      }
+      
+      if (filters.sortOrder === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+
+    setFilteredTransactions(filtered);
+  };
+
+  const handleFilterChange = (key, value) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
+  const getAllCategories = () => {
+    const categories = [...new Set(transactions.map(t => t.category))];
+    return categories.sort();
   };
 
   if (loading) {
@@ -74,19 +151,77 @@ function TransactionsPage() {
         </button>
       </div>
 
+      {/* Filters */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 mb-8">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filters & Search</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search transactions..."
+              value={filters.search}
+              onChange={(e) => handleFilterChange('search', e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <select
+            value={filters.type}
+            onChange={(e) => handleFilterChange('type', e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+
+          <select
+            value={filters.category}
+            onChange={(e) => handleFilterChange('category', e.target.value)}
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Categories</option>
+            {getAllCategories().map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+
+          <div className="flex gap-2">
+            <select
+              value={filters.sortBy}
+              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="date">Date</option>
+              <option value="amount">Amount</option>
+              <option value="category">Category</option>
+            </select>
+            <button
+              onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
+              {filters.sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+
+        
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {showForm && (
           <div className="lg:col-span-1">
-            <TransactionForm wallets={wallets} onAdd={handleAdd} />
+            <TransactionForm wallets={wallets} budgets={budgets} onAdd={handleAdd} />
           </div>
         )}
         
         <div className={showForm ? "lg:col-span-2" : "lg:col-span-3"}>
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-              Recent Transactions ({transactions.length})
+              Transactions ({filteredTransactions.length} of {transactions.length})
             </h3>
-            <TransactionList transactions={transactions} onDelete={handleDelete} />
+            <TransactionList transactions={filteredTransactions} onDelete={handleDelete} />
           </div>
         </div>
       </div>
