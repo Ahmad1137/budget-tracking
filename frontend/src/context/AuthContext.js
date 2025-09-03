@@ -8,21 +8,22 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api
-        .get("/api/auth/profile")
-        .then((res) => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const res = await api.get("/api/auth/profile");
           setUser(res.data);
-          setLoading(false);
-        })
-        .catch(() => {
+        } catch (error) {
+          console.error("Auth check failed:", error);
           localStorage.removeItem("token");
-          setLoading(false);
-        });
-    } else {
+          setUser(null);
+        }
+      }
       setLoading(false);
-    }
+    };
+    
+    checkAuth();
   }, []);
 
   const login = async (email, password) => {

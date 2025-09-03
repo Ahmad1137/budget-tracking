@@ -14,20 +14,21 @@ const MonthlyTransactionChart = () => {
         const res = await api.get('/api/transactions');
         const transactions = res.data;
         
-        if (transactions.length === 0) {
+        if (!transactions || transactions.length === 0) {
           setData([]);
           return;
         }
         
         const monthlyData = transactions.reduce((acc, t) => {
+          if (!t || !t.date) return acc;
           const month = new Date(t.date).toLocaleDateString('en-US', { month: 'short' });
           if (!acc[month]) {
             acc[month] = { month, income: 0, expense: 0 };
           }
           if (t.type === 'income') {
-            acc[month].income += t.amount;
+            acc[month].income += (t.amount || 0);
           } else {
-            acc[month].expense += t.amount;
+            acc[month].expense += (t.amount || 0);
           }
           return acc;
         }, {});

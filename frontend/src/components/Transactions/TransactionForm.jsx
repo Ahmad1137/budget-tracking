@@ -234,7 +234,7 @@ function TransactionForm({ wallets, budgets = [], onAdd }) {
                 onChange={handleChange}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors"
               >
-                <option value="">Personal</option>
+                <option value="">Select Wallet</option>
                 {wallets.map((wallet) => (
                   <option key={wallet._id} value={wallet._id}>
                     {wallet.name}

@@ -99,7 +99,7 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
               onChange={handleChange}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Personal</option>
+              <option value="">Select Wallet</option>
               {wallets && wallets.map((wallet) => (
                 <option key={wallet._id} value={wallet._id}>
                   {wallet.name}

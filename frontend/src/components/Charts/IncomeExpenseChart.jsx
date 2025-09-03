@@ -11,20 +11,21 @@ const IncomeExpenseChart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const BudgetsRes = await api.get('/api/budgets');
-        const Budgets = BudgetsRes.data;
+        const transactionsRes = await api.get('/api/transactions');
+        const transactions = transactionsRes.data || [];
         
-        const chartData = Budgets.map((budget, index) => ({
+        const chartData = transactions.map((transaction, index) => ({
           id: index + 1,
-          amount: transaction.amount,
-          type: transaction.type,
-          income: transaction.type === 'income' ? transaction.amount : 0,
-          expense: transaction.type === 'expense' ? transaction.amount : 0
+          amount: transaction.amount || 0,
+          type: transaction.type || 'expense',
+          income: transaction.type === 'income' ? (transaction.amount || 0) : 0,
+          expense: transaction.type === 'expense' ? (transaction.amount || 0) : 0
         }));
         
         setData(chartData);
       } catch (err) {
-        console.error(err);
+        console.error('Failed to fetch chart data:', err);
+        setData([]);
       } finally {
         setLoading(false);
       }

@@ -22,5 +22,13 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
+// Error handling middleware
+app.use(require('./middleware/errorHandler'));
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ msg: "Route not found" });
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

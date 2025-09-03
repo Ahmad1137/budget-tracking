@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { TrendingUp, TrendingDown, DollarSign, Wallet, Plus, ArrowUpRight, ArrowDownRight } from "lucide-react";
 import api from "../utils/api";
 import { AuthContext } from "../context/AuthContext";
-import BudgetSpendingChart from "../components/Charts/BudgetSpendingChart";
+import IncomeExpenseChart from "../components/Charts/IncomeExpenseChart";
 import MonthlyTransactionChart from "../components/Charts/MonthlyTransactionChart";
 
 function Dashboard() {
@@ -16,12 +16,13 @@ function Dashboard() {
     const fetchStats = async () => {
       try {
         const res = await api.get("/api/transactions");
-        const transactions = res.data;
-        const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-        const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const transactions = res.data || [];
+        const totalIncome = transactions.filter(t => t?.type === 'income').reduce((sum, t) => sum + (t?.amount || 0), 0);
+        const totalExpense = transactions.filter(t => t?.type === 'expense').reduce((sum, t) => sum + (t?.amount || 0), 0);
         setStats({ totalIncome, totalExpense });
       } catch (err) {
-        console.error(err);
+        console.error('Failed to fetch dashboard stats:', err);
+        setStats({ totalIncome: 0, totalExpense: 0 });
       } finally {
         setLoading(false);
       }
@@ -120,7 +121,7 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Income vs Expenses</h3>
-          <BudgetSpendingChart />
+          <IncomeExpenseChart/>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Monthly Balance</h3>

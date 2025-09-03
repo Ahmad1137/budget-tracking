@@ -10,7 +10,7 @@ import {
 import api from "../utils/api";
 import BudgetForm from "../components/Budgets/BudgetForm";
 import BudgetList from "../components/Budgets/BudgetList";
-import BudgetSpendingChart from "../components/Charts/BudgetSpendingChart";
+
 
 function BudgetsPage() {
   const [budgets, setBudgets] = useState([]);
@@ -318,13 +318,10 @@ function BudgetsPage() {
 
       {/* Budget List */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <BudgetList budgets={filteredBudgets} onUpdate={fetchData} />
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Budget vs Spending</h3>
-                  <BudgetSpendingChart />
-                </div>
+       
       </div>
 
       {/* AI Suggestion Card */}
