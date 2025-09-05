@@ -1,10 +1,12 @@
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 import { User, Mail, Lock, Phone, FileText, AlertCircle, Wallet, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { validateEmail, validatePassword, validateName, validatePhone } from "../../utils/validation";
 
 function Register() {
+  const { isDark } = useTheme();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -117,29 +119,29 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 isDark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors">
       <div className="max-w-md w-full">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div className="bg-white isDark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 isDark:border-gray-700 p-8">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div className="bg-blue-100 dark:bg-blue-900/20 p-3 rounded-full">
-                <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <div className="bg-blue-100 isDark:bg-blue-900/20 p-3 rounded-full">
+                <Wallet className="h-8 w-8 text-blue-600 isDark:text-blue-400" />
               </div>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">Create account</h2>
-            <p className="text-gray-600 dark:text-gray-400">Start managing your budget today</p>
+            <h2 className="text-2xl font-semibold text-gray-900 isDark:text-white mb-2">Create account</h2>
+            <p className="text-gray-600 isDark:text-gray-400">Start managing your budget today</p>
           </div>
 
           {errors.general && (
-            <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <span className="text-red-700 dark:text-red-400">{errors.general}</span>
+            <div className="mb-6 p-4 bg-red-50 isDark:bg-red-900/20 border border-red-200 isDark:border-red-800 rounded-lg flex items-center space-x-2">
+              <AlertCircle className="h-5 w-5 text-red-600 isDark:text-red-400" />
+              <span className="text-red-700 isDark:text-red-400">{errors.general}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                 Full name
               </label>
               <div className="relative">
@@ -149,20 +151,20 @@ function Register() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
-                    errors.name ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
+                    errors.name ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
                   }`}
                   placeholder="Enter your full name"
                   required
                 />
               </div>
               {errors.name && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+                <p className="mt-1 text-sm text-red-600 isDark:text-red-400">{errors.name}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                 Email address
               </label>
               <div className="relative">
@@ -172,20 +174,20 @@ function Register() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
-                    errors.email ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
+                    errors.email ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
                   }`}
                   placeholder="Enter your email"
                   required
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                <p className="mt-1 text-sm text-red-600 isDark:text-red-400">{errors.email}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -195,8 +197,8 @@ function Register() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
-                    errors.password ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
+                    errors.password ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
                   }`}
                   placeholder="Create a password"
                   required
@@ -204,7 +206,7 @@ function Register() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 isDark:hover:text-gray-300"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -212,17 +214,17 @@ function Register() {
               {formData.password && (
                 <div className="mt-2">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600 dark:text-gray-400">Password strength:</span>
+                    <span className="text-gray-600 isDark:text-gray-400">Password strength:</span>
                     <span className={`font-medium ${
-                      getPasswordStrength().strength >= 4 ? "text-green-600 dark:text-green-400" :
-                      getPasswordStrength().strength >= 3 ? "text-blue-600 dark:text-blue-400" :
-                      getPasswordStrength().strength >= 2 ? "text-yellow-600 dark:text-yellow-400" :
-                      "text-red-600 dark:text-red-400"
+                      getPasswordStrength().strength >= 4 ? "text-green-600 isDark:text-green-400" :
+                      getPasswordStrength().strength >= 3 ? "text-blue-600 isDark:text-blue-400" :
+                      getPasswordStrength().strength >= 2 ? "text-yellow-600 isDark:text-yellow-400" :
+                      "text-red-600 isDark:text-red-400"
                     }`}>
                       {getPasswordStrength().label}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-full bg-gray-200 isDark:bg-gray-700 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrength().color}`}
                       style={{ width: getPasswordStrength().width }}
@@ -231,12 +233,12 @@ function Register() {
                 </div>
               )}
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
+                <p className="mt-1 text-sm text-red-600 isDark:text-red-400">{errors.password}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -246,8 +248,8 @@ function Register() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
-                    errors.confirmPassword ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
+                    errors.confirmPassword ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
                   }`}
                   placeholder="Confirm your password"
                   required
@@ -255,24 +257,24 @@ function Register() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 isDark:hover:text-gray-300"
                 >
                   {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
               {formData.confirmPassword && formData.password === formData.confirmPassword && (
-                <div className="mt-1 flex items-center space-x-1 text-green-600 dark:text-green-400">
+                <div className="mt-1 flex items-center space-x-1 text-green-600 isDark:text-green-400">
                   <CheckCircle className="h-4 w-4" />
                   <span className="text-sm">Passwords match</span>
                 </div>
               )}
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword}</p>
+                <p className="mt-1 text-sm text-red-600 isDark:text-red-400">{errors.confirmPassword}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                 Phone number (optional)
               </label>
               <div className="relative">
@@ -282,19 +284,19 @@ function Register() {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors ${
-                    errors.phoneNumber ? "border-red-500 dark:border-red-400" : "border-gray-300 dark:border-gray-600"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
+                    errors.phoneNumber ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
                   }`}
                   placeholder="+1 (555) 123-4567"
                 />
               </div>
               {errors.phoneNumber && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phoneNumber}</p>
+                <p className="mt-1 text-sm text-red-600 isDark:text-red-400">{errors.phoneNumber}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                 Bio (optional)
               </label>
               <div className="relative">
@@ -304,7 +306,7 @@ function Register() {
                   value={formData.bio}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors resize-none"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors resize-none"
                   placeholder="Tell us about yourself..."
                 />
               </div>
@@ -327,9 +329,9 @@ function Register() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600 isDark:text-gray-400">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:text-blue-500 font-medium">
+              <Link to="/login" className="text-blue-600 isDark:text-blue-400 hover:text-blue-500 font-medium">
                 Sign in
               </Link>
             </p>

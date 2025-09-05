@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { CreditCard, Plus, Search, Filter, SortAsc, SortDesc } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import api from "../utils/api";
 import TransactionForm from "../components/Transactions/TransactionForm";
 import TransactionList from "../components/Transactions/TransactionList";
 
 function TransactionsPage() {
+  const { isDark } = useTheme();
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [wallets, setWallets] = useState([]);
@@ -118,10 +120,10 @@ function TransactionsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-8"></div>
+          <div className={`h-8 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded w-48 mb-8`}></div>
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+              <div key={i} className={`h-20 ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-xl`}></div>
             ))}
           </div>
         </div>
@@ -133,12 +135,12 @@ function TransactionsPage() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-3">
-          <div className="bg-blue-100 dark:bg-blue-900/20 p-2 rounded-lg">
-            <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          <div className={`${isDark ? 'bg-blue-900/20' : 'bg-blue-100'} p-2 rounded-lg`}>
+            <CreditCard className={`h-6 w-6 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
-            <p className="text-gray-600 dark:text-gray-400">Track your income and expenses</p>
+            <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Transactions</h1>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Track your income and expenses</p>
           </div>
         </div>
         
@@ -152,8 +154,8 @@ function TransactionsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 mb-8">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Filters & Search</h3>
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl p-6 border mb-8`}>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Filters & Search</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -162,14 +164,14 @@ function TransactionsPage() {
               placeholder="Search transactions..."
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              className={`w-full pl-10 pr-4 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500`}
             />
           </div>
 
           <select
             value={filters.type}
             onChange={(e) => handleFilterChange('type', e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500`}
           >
             <option value="all">All Types</option>
             <option value="income">Income</option>
@@ -179,7 +181,7 @@ function TransactionsPage() {
           <select
             value={filters.category}
             onChange={(e) => handleFilterChange('category', e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+            className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500`}
           >
             <option value="all">All Categories</option>
             {getAllCategories().map(cat => (
@@ -191,7 +193,7 @@ function TransactionsPage() {
             <select
               value={filters.sortBy}
               onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              className={`flex-1 px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500`}
             >
               <option value="date">Date</option>
               <option value="amount">Amount</option>
@@ -199,7 +201,7 @@ function TransactionsPage() {
             </select>
             <button
               onClick={() => handleFilterChange('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600"
+              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600' : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'} rounded-lg`}
             >
               {filters.sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
             </button>
@@ -212,13 +214,13 @@ function TransactionsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {showForm && (
           <div className="lg:col-span-1">
-            <TransactionForm wallets={wallets} budgets={budgets} onAdd={handleAdd} />
+            <TransactionForm wallets={wallets} budgets={budgets} transactions={transactions} onAdd={handleAdd} />
           </div>
         )}
         
         <div className={showForm ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+          <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl p-6 border`}>
+            <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>
               Transactions ({filteredTransactions.length} of {transactions.length})
             </h3>
             <TransactionList transactions={filteredTransactions} onDelete={handleDelete} />

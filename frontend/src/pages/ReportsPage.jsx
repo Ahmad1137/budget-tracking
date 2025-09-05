@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, Calendar } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import api from "../utils/api";
 
 function ReportsPage() {
+  const { isDark } = useTheme();
   const [data, setData] = useState({
     incomeExpense: [],
     categoryBreakdown: [],
@@ -75,15 +77,15 @@ function ReportsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Financial Reports</h1>
-          <p className="text-gray-600 dark:text-gray-400">Analyze your income and spending patterns</p>
+          <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>Financial Reports</h1>
+          <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Analyze your income and spending patterns</p>
         </div>
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-400" />
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg`}
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -94,28 +96,28 @@ function ReportsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Income</p>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Total Income</p>
               <p className="text-2xl font-bold text-green-600">${data.incomeExpense[0]?.value.toFixed(2) || '0.00'}</p>
             </div>
             <TrendingUp className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Expenses</p>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Total Expenses</p>
               <p className="text-2xl font-bold text-red-600">${data.incomeExpense[1]?.value.toFixed(2) || '0.00'}</p>
             </div>
             <TrendingDown className="h-8 w-8 text-red-500" />
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Net Balance</p>
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Net Balance</p>
               <p className={`text-2xl font-bold ${
                 (data.incomeExpense[0]?.value || 0) - (data.incomeExpense[1]?.value || 0) >= 0 
                   ? 'text-blue-600' : 'text-red-600'
@@ -131,8 +133,8 @@ function ReportsPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Income vs Expenses Pie Chart */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Income vs Expenses</h3>
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
+          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Income vs Expenses</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -156,8 +158,8 @@ function ReportsPage() {
         </div>
 
         {/* Expense Categories Pie Chart */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Expense Categories</h3>
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
+          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Expense Categories</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -182,38 +184,38 @@ function ReportsPage() {
       </div>
 
       {/* Category Breakdown Table */}
-      <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Expense Breakdown</h3>
+      <div className={`mt-8 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl border overflow-hidden`}>
+        <div className={`p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+          <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>Expense Breakdown</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className={`${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                <th className={`px-6 py-3 text-left text-xs font-medium ${isDark ? 'text-gray-300' : 'text-gray-500'} uppercase tracking-wider`}>
                   Percentage
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className={`divide-y ${isDark ? 'divide-gray-700' : 'divide-gray-200'}`}>
               {data.categoryBreakdown.map((category, index) => {
                 const totalExpenses = data.incomeExpense[1]?.value || 1;
                 const percentage = (category.value / totalExpenses) * 100;
                 return (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {category.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                       ${category.value.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDark ? 'text-gray-300' : 'text-gray-500'}`}>
                       {percentage.toFixed(1)}%
                     </td>
                   </tr>

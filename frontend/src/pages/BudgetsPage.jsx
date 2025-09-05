@@ -7,12 +7,14 @@ import {
   AlertTriangle,
   CheckCircle,
 } from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 import api from "../utils/api";
 import BudgetForm from "../components/Budgets/BudgetForm";
 import BudgetList from "../components/Budgets/BudgetList";
 
 
 function BudgetsPage() {
+  const { isDark } = useTheme();
   const [budgets, setBudgets] = useState([]);
   const [wallets, setWallets] = useState([]);
   const [filteredBudgets, setFilteredBudgets] = useState([]);
@@ -137,10 +139,10 @@ function BudgetsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>
             Budget Management
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             {new Date(
               selectedPeriod.year,
               selectedPeriod.month - 1
@@ -172,23 +174,23 @@ function BudgetsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Total Budgets
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {stats.total}
               </p>
             </div>
             <TrendingUp className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Over Budget
               </p>
               <p className="text-2xl font-bold text-red-600">
@@ -198,26 +200,26 @@ function BudgetsPage() {
             <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Total Budget
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 ${stats.totalBudget}
               </p>
             </div>
             <div className="text-green-500 text-sm">Budget</div>
           </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Total Spent
               </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 ${stats.totalSpent}
               </p>
             </div>
@@ -227,10 +229,10 @@ function BudgetsPage() {
       </div>
 
       {/* Period Selector */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-xl border mb-6`}>
         <div className="flex flex-wrap gap-4 items-center">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
               Year
             </label>
             <select
@@ -241,7 +243,7 @@ function BudgetsPage() {
                   year: parseInt(e.target.value),
                 })
               }
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg`}
             >
               {[2023, 2024, 2025, 2026].map((year) => (
                 <option key={year} value={year}>
@@ -251,7 +253,7 @@ function BudgetsPage() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
               Month
             </label>
             <select
@@ -262,7 +264,7 @@ function BudgetsPage() {
                   month: parseInt(e.target.value),
                 })
               }
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg`}
             >
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <option key={month} value={month}>
@@ -288,7 +290,7 @@ function BudgetsPage() {
       )}
 
       {/* Search and Filter */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-6">
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-xl border mb-6`}>
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -297,7 +299,7 @@ function BudgetsPage() {
               placeholder="Search budgets by category..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full pl-10 pr-4 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
           </div>
           <div className="flex items-center space-x-2">
@@ -305,7 +307,7 @@ function BudgetsPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
               <option value="all">All Budgets</option>
               <option value="good">On Track</option>
@@ -325,8 +327,8 @@ function BudgetsPage() {
       </div>
 
       {/* AI Suggestion Card */}
-      <div className="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+      <div className={`mt-8 p-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl border`}>
+        <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
           AI Budget Suggestions
         </h3>
         <button
@@ -343,7 +345,7 @@ function BudgetsPage() {
         </button>
         {aiError && <p className="text-red-500 text-sm mb-2">{aiError}</p>}
         {aiSuggestion && (
-          <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+          <div className={`${isDark ? 'text-gray-300' : 'text-gray-700'} whitespace-pre-wrap`}>
             {aiSuggestion}
           </div>
         )}

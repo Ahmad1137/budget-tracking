@@ -5,11 +5,13 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowRight, BarChart3, Users, Zap, CreditCard, Building2, TrendingUp, Star, Shield, IndianRupee } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
 function Home() {
   const { user } = useContext(AuthContext);
+  const { isDark } = useTheme();
   const shieldRef = useRef(null);
   const trustedCompaniesRef = useRef(null);
   const [stats, setStats] = useState({
@@ -193,14 +195,14 @@ function Home() {
             className="text-left lg:pr-8"
           >
             <motion.h1 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-gray-900 dark:text-white mb-6 sm:mb-8 leading-tight"
+              className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-6 sm:mb-8 leading-tight`}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               Take Control of Your
               <motion.span 
-                className="text-blue-600 dark:text-blue-400 block"
+                className={`${isDark ? 'text-blue-400' : 'text-blue-600'} block`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.5 }}
@@ -208,7 +210,7 @@ function Home() {
             </motion.h1>
             
             <motion.p 
-              className="text-lg sm:text-xl lg:text-2xl text-gray-600 dark:text-gray-400 mb-8 sm:mb-12 leading-relaxed"
+              className={`text-lg sm:text-xl lg:text-2xl ${isDark ? 'text-gray-400' : 'text-gray-600'} mb-8 sm:mb-12 leading-relaxed`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -257,7 +259,7 @@ function Home() {
                   >
                     <Link
                       to="/login"
-                      className="inline-flex items-center justify-center space-x-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 font-semibold py-4 sm:py-5 px-6 sm:px-10 rounded-xl text-base sm:text-lg transition-all shadow-lg hover:shadow-xl w-full sm:w-auto"
+                      className={`inline-flex items-center justify-center space-x-3 ${isDark ? 'bg-gray-800 text-white border-gray-600 hover:bg-gray-700' : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'} border-2 font-semibold py-4 sm:py-5 px-6 sm:px-10 rounded-xl text-base sm:text-lg transition-all shadow-lg hover:shadow-xl w-full sm:w-auto`}
                     >
                       <span>Sign In</span>
                     </Link>
@@ -266,7 +268,7 @@ function Home() {
               )}
               
               <motion.div 
-                className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6 lg:space-x-8 text-sm text-gray-500 dark:text-gray-400"
+                className={`flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-6 lg:space-x-8 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.8 }}
@@ -297,11 +299,11 @@ function Home() {
                 animate={{ opacity: 0.9, scale: 1, rotate: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
               >
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full flex items-center justify-center relative overflow-hidden shadow-2xl">
+                <div className={`bg-gradient-to-br ${isDark ? 'from-blue-900/30 to-indigo-900/30' : 'from-blue-50 to-indigo-100'} w-64 h-64 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full flex items-center justify-center relative overflow-hidden shadow-2xl`}>
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 animate-pulse"></div>
-                  <div className="absolute inset-4 bg-gradient-to-br from-blue-100/50 to-indigo-200/50 dark:from-blue-800/20 dark:to-indigo-800/20 rounded-full"></div>
-                  <Shield className="h-32 w-32 sm:h-36 sm:w-36 lg:h-40 lg:w-40 text-blue-600 dark:text-blue-400 relative z-10 drop-shadow-lg" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-white/20 dark:to-black/20"></div>
+                  <div className={`absolute inset-4 bg-gradient-to-br ${isDark ? 'from-blue-800/20 to-indigo-800/20' : 'from-blue-100/50 to-indigo-200/50'} rounded-full`}></div>
+                  <Shield className={`h-32 w-32 sm:h-36 sm:w-36 lg:h-40 lg:w-40 ${isDark ? 'text-blue-400' : 'text-blue-600'} relative z-10 drop-shadow-lg`} />
+                  <div className={`absolute inset-0 bg-gradient-to-t from-transparent via-transparent ${isDark ? 'to-black/20' : 'to-white/20'}`}></div>
                   <div className="absolute top-6 right-6 sm:top-8 sm:right-8 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full animate-ping"></div>
                   <div className="absolute bottom-10 left-10 sm:bottom-12 sm:left-12 w-2 h-2 sm:w-3 sm:h-3 bg-blue-400 rounded-full animate-bounce"></div>
                 </div>
@@ -322,10 +324,10 @@ function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="text-center mb-12" variants={itemVariants}>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
               Trusted by thousands worldwide
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} max-w-2xl mx-auto text-sm sm:text-base`}>
               Join our growing community of smart money managers
             </p>
           </motion.div>
@@ -348,21 +350,21 @@ function Home() {
                 >
                   <motion.div 
                     ref={stat.isShieldTarget ? trustedCompaniesRef : null}
-                    className={`bg-${stat.color}-100 dark:bg-${stat.color}-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}
+                    className={`${isDark ? `bg-${stat.color}-900/20` : `bg-${stat.color}-100`} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {Icon && <Icon className={`h-8 w-8 text-${stat.color}-600 dark:text-${stat.color}-400`} />}
+                    {Icon && <Icon className={`h-8 w-8 ${isDark ? `text-${stat.color}-400` : `text-${stat.color}-600`}`} />}
                   </motion.div>
                   <motion.div 
-                    className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2"
+                    className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}
                     initial={{ scale: 0 }}
                     whileInView={{ scale: 1 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
                     {stat.prefix}{formatNumber(stat.value)}+
                   </motion.div>
-                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{stat.label}</p>
+                  <p className={`text-sm sm:text-base ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{stat.label}</p>
                 </motion.div>
               );
             })}
@@ -372,7 +374,7 @@ function Home() {
 
       {/* Features Section */}
       <motion.div 
-        className="features-section bg-white dark:bg-gray-800 py-16"
+        className={`features-section ${isDark ? 'bg-gray-800' : 'bg-white'} py-16`}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -380,10 +382,10 @@ function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="text-center mb-12" variants={itemVariants}>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
               Everything you need to manage your money
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-sm sm:text-base">
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} max-w-2xl mx-auto text-sm sm:text-base`}>
               Our comprehensive suite of tools makes budgeting simple and effective
             </p>
           </motion.div>
@@ -400,16 +402,16 @@ function Home() {
                   transition={{ duration: 0.3 }}
                 >
                   <motion.div 
-                    className="bg-blue-100 dark:bg-blue-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-900/30 transition-colors"
+                    className={`${isDark ? 'bg-blue-900/20 group-hover:bg-blue-900/30' : 'bg-blue-100 group-hover:bg-blue-200'} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 transition-colors`}
                     whileHover={{ scale: 1.2, rotate: 10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <Icon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                    <Icon className={`h-8 w-8 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
                   </motion.div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                  <h3 className={`text-lg font-semibold ${isDark ? 'text-white group-hover:text-blue-400' : 'text-gray-900 group-hover:text-blue-600'} mb-2 transition-colors`}>
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {feature.description}
                   </p>
                 </motion.div>
@@ -429,7 +431,7 @@ function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div className="text-center mb-12" variants={itemVariants}>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
               What our users say
             </h2>
           </motion.div>
@@ -454,7 +456,7 @@ function Home() {
             ].map((testimonial, index) => (
               <motion.div 
                 key={index} 
-                className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700"
+                className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl p-6 border`}
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02 }}
                 transition={{ duration: 0.2 }}
@@ -471,12 +473,12 @@ function Home() {
                     </motion.div>
                   ))}
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4 italic">
+                <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'} mb-4 italic`}>
                   "{testimonial.content}"
                 </p>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
+                  <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{testimonial.name}</p>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{testimonial.role}</p>
                 </div>
               </motion.div>
             ))}
@@ -495,14 +497,14 @@ function Home() {
         >
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
             <motion.div 
-              className="bg-white dark:bg-gray-800 rounded-2xl p-12 border border-gray-200 dark:border-gray-700"
+              className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl p-12 border`}
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.2 }}
             >
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              <h2 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>
                 Ready to start your financial journey?
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-8 text-base sm:text-lg">
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} mb-8 text-base sm:text-lg`}>
                 Join thousands of users who have taken control of their finances
               </p>
               <motion.div

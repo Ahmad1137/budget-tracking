@@ -2,11 +2,13 @@ import { useState, useContext, useEffect } from "react";
 import { User, Wallet, Target, TrendingUp, Settings, Shield, Bell, Lock, Key, Smartphone, AlertCircle, CheckCircle } from "lucide-react";
 import Profile from "../components/Auth/Profile";
 import { AuthContext } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import api from "../utils/api";
 
 // Security Settings Component
 function SecuritySettings() {
   const { user } = useContext(AuthContext);
+  const { isDark } = useTheme();
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
@@ -105,31 +107,31 @@ function SecuritySettings() {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Security Settings</h3>
+    <div className="bg-white isDark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 isDark:border-gray-700 p-6">
+      <h3 className="text-xl font-semibold text-gray-900 isDark:text-white mb-6">Security Settings</h3>
       
       {error && (
-        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center space-x-2">
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-          <span className="text-red-700 dark:text-red-400">{error}</span>
+        <div className="mb-4 p-4 bg-red-50 isDark:bg-red-900/20 border border-red-200 isDark:border-red-800 rounded-lg flex items-center space-x-2">
+          <AlertCircle className="h-5 w-5 text-red-600 isDark:text-red-400" />
+          <span className="text-red-700 isDark:text-red-400">{error}</span>
         </div>
       )}
       
       {success && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center space-x-2">
-          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-          <span className="text-green-700 dark:text-green-400">{success}</span>
+        <div className="mb-4 p-4 bg-green-50 isDark:bg-green-900/20 border border-green-200 isDark:border-green-800 rounded-lg flex items-center space-x-2">
+          <CheckCircle className="h-5 w-5 text-green-600 isDark:text-green-400" />
+          <span className="text-green-700 isDark:text-green-400">{success}</span>
         </div>
       )}
       
       <div className="space-y-6">
-        <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+        <div className="border-b border-gray-200 isDark:border-gray-700 pb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <Lock className="h-5 w-5 text-gray-400" />
               <div>
-                <h4 className="text-lg font-medium text-gray-900 dark:text-white">Password</h4>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">Keep your account secure</p>
+                <h4 className="text-lg font-medium text-gray-900 isDark:text-white">Password</h4>
+                <p className="text-gray-600 isDark:text-gray-400 text-sm">Keep your account secure</p>
               </div>
             </div>
             <button
@@ -141,13 +143,13 @@ function SecuritySettings() {
           </div>
           
           {showPasswordForm && (
-            <form onSubmit={handlePasswordChange} className="mt-4 space-y-4 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+            <form onSubmit={handlePasswordChange} className="mt-4 space-y-4 bg-gray-50 isDark:bg-gray-700 p-4 rounded-lg">
               <input
                 type="password"
                 placeholder="Current Password"
                 value={passwordForm.currentPassword}
                 onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 isDark:border-gray-600 rounded-lg bg-white isDark:bg-gray-800 text-gray-900 isDark:text-white"
                 required
               />
               <input
@@ -155,7 +157,7 @@ function SecuritySettings() {
                 placeholder="New Password"
                 value={passwordForm.newPassword}
                 onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 isDark:border-gray-600 rounded-lg bg-white isDark:bg-gray-800 text-gray-900 isDark:text-white"
                 required
                 minLength={8}
               />
@@ -164,7 +166,7 @@ function SecuritySettings() {
                 placeholder="Confirm New Password"
                 value={passwordForm.confirmPassword}
                 onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 isDark:border-gray-600 rounded-lg bg-white isDark:bg-gray-800 text-gray-900 isDark:text-white"
                 required
               />
               <div className="flex space-x-3">
@@ -187,13 +189,13 @@ function SecuritySettings() {
           )}
         </div>
         
-        <div className="border-b border-gray-200 dark:border-gray-700 pb-6">
+        <div className="border-b border-gray-200 isDark:border-gray-700 pb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
               <Smartphone className="h-5 w-5 text-gray-400" />
               <div>
-                <h4 className="text-lg font-medium text-gray-900 dark:text-white">Two-Factor Authentication</h4>
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                <h4 className="text-lg font-medium text-gray-900 isDark:text-white">Two-Factor Authentication</h4>
+                <p className="text-gray-600 isDark:text-gray-400 text-sm">
                   {twoFactorEnabled ? 'Your account is protected with Google Authenticator' : 'Secure your account with Google Authenticator'}
                 </p>
               </div>
@@ -218,14 +220,14 @@ function SecuritySettings() {
           </div>
           
           {show2FASetup && (
-            <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <h5 className="font-medium text-gray-900 dark:text-white mb-4">Setup Google Authenticator</h5>
+            <div className="mt-4 p-4 bg-gray-50 isDark:bg-gray-700 rounded-lg">
+              <h5 className="font-medium text-gray-900 isDark:text-white mb-4">Setup Google Authenticator</h5>
               <div className="space-y-4">
                 <div className="text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-sm text-gray-600 isDark:text-gray-400 mb-4">
                     1. Install Google Authenticator on your phone
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-sm text-gray-600 isDark:text-gray-400 mb-4">
                     2. Scan this QR code with the app:
                   </p>
                   {twoFactorData.qrCode && (
@@ -235,19 +237,19 @@ function SecuritySettings() {
                       className="mx-auto mb-4 border rounded-lg"
                     />
                   )}
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Or enter this secret manually: <code className="bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded text-xs">{twoFactorData.secret}</code>
+                  <p className="text-sm text-gray-600 isDark:text-gray-400 mb-4">
+                    Or enter this secret manually: <code className="bg-gray-200 isDark:bg-gray-600 px-2 py-1 rounded text-xs">{twoFactorData.secret}</code>
                   </p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
                     3. Enter the 6-digit code from your app:
                   </label>
                   <input
                     type="text"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-center text-xl tracking-widest"
+                    className="w-full px-3 py-2 border border-gray-300 isDark:border-gray-600 rounded-lg bg-white isDark:bg-gray-800 text-gray-900 isDark:text-white text-center text-xl tracking-widest"
                     placeholder="000000"
                     maxLength={6}
                   />
@@ -276,17 +278,17 @@ function SecuritySettings() {
           <div className="flex items-center space-x-3 mb-4">
             <Key className="h-5 w-5 text-gray-400" />
             <div>
-              <h4 className="text-lg font-medium text-gray-900 dark:text-white">Active Sessions</h4>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">Current login session</p>
+              <h4 className="text-lg font-medium text-gray-900 isDark:text-white">Active Sessions</h4>
+              <p className="text-gray-600 isDark:text-gray-400 text-sm">Current login session</p>
             </div>
           </div>
-          <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+          <div className="bg-gray-50 isDark:bg-gray-700 p-4 rounded-lg">
             <div className="flex justify-between items-center">
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Current Session</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Active now</p>
+                <p className="font-medium text-gray-900 isDark:text-white">Current Session</p>
+                <p className="text-sm text-gray-500 isDark:text-gray-400">Active now</p>
               </div>
-              <span className="text-green-600 dark:text-green-400 text-sm font-medium px-2 py-1 bg-green-100 dark:bg-green-900/20 rounded">
+              <span className="text-green-600 isDark:text-green-400 text-sm font-medium px-2 py-1 bg-green-100 isDark:bg-green-900/20 rounded">
                 Current
               </span>
             </div>
@@ -299,6 +301,7 @@ function SecuritySettings() {
 
 function ProfilePage() {
   const { user } = useContext(AuthContext);
+  const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState("profile");
   const [stats, setStats] = useState({
     totalWallets: 0,
@@ -370,8 +373,8 @@ function ProfilePage() {
       
       case "stats":
         return (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Your Statistics</h3>
+          <div className="bg-white isDark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 isDark:border-gray-700 p-6">
+            <h3 className="text-xl font-semibold text-gray-900 isDark:text-white mb-6">Your Statistics</h3>
             
             {loading ? (
               <div className="flex justify-center py-8">
@@ -379,42 +382,42 @@ function ProfilePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <div className="bg-blue-50 isDark:bg-blue-900/20 p-4 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                    <Wallet className="h-8 w-8 text-blue-600 isDark:text-blue-400" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Wallets</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalWallets}</p>
+                      <p className="text-sm text-gray-600 isDark:text-gray-400">Total Wallets</p>
+                      <p className="text-2xl font-bold text-gray-900 isDark:text-white">{stats.totalWallets}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                <div className="bg-green-50 isDark:bg-green-900/20 p-4 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <Target className="h-8 w-8 text-green-600 dark:text-green-400" />
+                    <Target className="h-8 w-8 text-green-600 isDark:text-green-400" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Active Budgets</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalBudgets}</p>
+                      <p className="text-sm text-gray-600 isDark:text-gray-400">Active Budgets</p>
+                      <p className="text-2xl font-bold text-gray-900 isDark:text-white">{stats.totalBudgets}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                <div className="bg-purple-50 isDark:bg-purple-900/20 p-4 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                    <TrendingUp className="h-8 w-8 text-purple-600 isDark:text-purple-400" />
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Total Transactions</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalTransactions}</p>
+                      <p className="text-sm text-gray-600 isDark:text-gray-400">Total Transactions</p>
+                      <p className="text-2xl font-bold text-gray-900 isDark:text-white">{stats.totalTransactions}</p>
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+                <div className="bg-orange-50 isDark:bg-orange-900/20 p-4 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="h-8 w-8 bg-orange-600 dark:bg-orange-400 rounded-full flex items-center justify-center text-white font-bold">$</div>
+                    <div className="h-8 w-8 bg-orange-600 isDark:bg-orange-400 rounded-full flex items-center justify-center text-white font-bold">$</div>
                     <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">This Month's Spending</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.monthlySpending}</p>
+                      <p className="text-sm text-gray-600 isDark:text-gray-400">This Month's Spending</p>
+                      <p className="text-2xl font-bold text-gray-900 isDark:text-white">${stats.monthlySpending}</p>
                     </div>
                   </div>
                 </div>
@@ -422,11 +425,11 @@ function ProfilePage() {
             )}
             
             <div className="mt-8">
-              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Account Overview</h4>
+              <h4 className="text-lg font-medium text-gray-900 isDark:text-white mb-4">Account Overview</h4>
               <div className="space-y-3">
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400">Member since</span>
-                  <span className="text-gray-900 dark:text-white font-medium">
+                  <span className="text-gray-600 isDark:text-gray-400">Member since</span>
+                  <span className="text-gray-900 isDark:text-white font-medium">
                     {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { 
                       year: 'numeric', 
                       month: 'long', 
@@ -439,12 +442,12 @@ function ProfilePage() {
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400">Account status</span>
-                  <span className="text-green-600 dark:text-green-400 font-medium">✓ Active</span>
+                  <span className="text-gray-600 isDark:text-gray-400">Account status</span>
+                  <span className="text-green-600 isDark:text-green-400 font-medium">✓ Active</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600 dark:text-gray-400">Profile completion</span>
-                  <span className="text-blue-600 dark:text-blue-400 font-medium">85%</span>
+                  <span className="text-gray-600 isDark:text-gray-400">Profile completion</span>
+                  <span className="text-blue-600 isDark:text-blue-400 font-medium">85%</span>
                 </div>
               </div>
             </div>
@@ -453,16 +456,16 @@ function ProfilePage() {
       
       case "settings":
         return (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Preferences</h3>
+          <div className="bg-white isDark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 isDark:border-gray-700 p-6">
+            <h3 className="text-xl font-semibold text-gray-900 isDark:text-white mb-6">Preferences</h3>
             
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <Bell className="h-5 w-5 text-gray-400" />
                   <div>
-                    <p className="text-gray-900 dark:text-white font-medium">Notifications</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Receive email notifications</p>
+                    <p className="text-gray-900 isDark:text-white font-medium">Notifications</p>
+                    <p className="text-sm text-gray-500 isDark:text-gray-400">Receive email notifications</p>
                   </div>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -472,16 +475,16 @@ function ProfilePage() {
                     onChange={(e) => handlePreferenceChange('notifications', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 isDark:peer-focus:ring-blue-800 rounded-full peer isDark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all isDark:border-gray-600 peer-checked:bg-blue-600"></div>
                 </label>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Currency</label>
+                <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">Currency</label>
                 <select
                   value={preferences.currency}
                   onChange={(e) => handlePreferenceChange('currency', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 isDark:border-gray-600 rounded-lg bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="USD">USD ($) - US Dollar</option>
                   <option value="EUR">EUR (€) - Euro</option>
@@ -489,34 +492,20 @@ function ProfilePage() {
                   <option value="JPY">JPY (¥) - Japanese Yen</option>
                   <option value="CAD">CAD ($) - Canadian Dollar</option>
                   <option value="AUD">AUD ($) - Australian Dollar</option>
-                  <option value="CHF">CHF - Swiss Franc</option>
-                  <option value="CNY">CNY (¥) - Chinese Yuan</option>
-                  <option value="INR">INR (₹) - Indian Rupee</option>
-                  <option value="KRW">KRW (₩) - South Korean Won</option>
-                  <option value="BRL">BRL (R$) - Brazilian Real</option>
-                  <option value="MXN">MXN ($) - Mexican Peso</option>
                 </select>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language</label>
+                <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">Language</label>
                 <select
                   value={preferences.language}
                   onChange={(e) => handlePreferenceChange('language', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 isDark:border-gray-600 rounded-lg bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="en">English</option>
                   <option value="es">Español (Spanish)</option>
                   <option value="fr">Français (French)</option>
                   <option value="de">Deutsch (German)</option>
-                  <option value="it">Italiano (Italian)</option>
-                  <option value="pt">Português (Portuguese)</option>
-                  <option value="ru">Русский (Russian)</option>
-                  <option value="ja">日本語 (Japanese)</option>
-                  <option value="ko">한국어 (Korean)</option>
-                  <option value="zh">中文 (Chinese)</option>
-                  <option value="ar">العربية (Arabic)</option>
-                  <option value="hi">हिन्दी (Hindi)</option>
                 </select>
               </div>
             </div>
@@ -524,9 +513,7 @@ function ProfilePage() {
         );
       
       case "security":
-        return (
-          <SecuritySettings />
-        );
+        return <SecuritySettings />;
       
       default:
         return null;
@@ -534,16 +521,16 @@ function ProfilePage() {
   };
 
   return (
-    <div className="container mx-auto mt-6 px-4">
+    <div className="container mx-auto mt-6 px-4 bg-gray-50 isDark:bg-gray-900 min-h-screen transition-colors">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Account Settings</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your profile, preferences, and security settings</p>
+        <div className="mb-8 pt-8">
+          <h1 className="text-3xl font-bold text-gray-900 isDark:text-white mb-2">Account Settings</h1>
+          <p className="text-gray-600 isDark:text-gray-400">Manage your profile, preferences, and security settings</p>
         </div>
         
         {/* Tabs */}
-        <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700 mb-8">
+        <div className="flex flex-wrap border-b border-gray-200 isDark:border-gray-700 mb-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
@@ -552,8 +539,8 @@ function ProfilePage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 px-4 py-3 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "border-blue-500 text-blue-600 isDark:text-blue-400"
+                    : "border-transparent text-gray-500 isDark:text-gray-400 hover:text-gray-700 isDark:hover:text-gray-300 hover:border-gray-300 isDark:hover:border-gray-600"
                 }`}
               >
                 <Icon className="h-4 w-4" />

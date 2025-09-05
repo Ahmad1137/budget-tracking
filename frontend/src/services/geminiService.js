@@ -1,11 +1,24 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+let GoogleGenerativeAI;
+try {
+  const module = require('@google/generative-ai');
+  GoogleGenerativeAI = module.GoogleGenerativeAI;
+} catch (error) {
+  console.warn('Google Generative AI not installed. AI features will use fallback descriptions.');
+}
 
-const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
+const API_KEY = "http://localhost:5000";
 
-const genAI = new GoogleGenerativeAI(API_KEY);
+let genAI = null;
+if (API_KEY && GoogleGenerativeAI) {
+  genAI = new GoogleGenerativeAI(API_KEY);
+}
 
 export const generateTransactionDescription = async (type, category, amount) => {
   try {
+    if (!genAI || !API_KEY || !GoogleGenerativeAI) {
+      throw new Error('Gemini API not configured');
+    }
+    
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     
     const prompt = `Generate a brief transaction description for a ${type} of $${amount} in the ${category} category. 
