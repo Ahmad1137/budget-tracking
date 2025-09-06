@@ -140,7 +140,7 @@ function TransactionsPage() {
           </div>
           <div>
             <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>Transactions</h1>
-            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Track your income and expenses</p>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Track your income & expenses</p>
           </div>
         </div>
         
