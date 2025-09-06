@@ -278,7 +278,7 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
           Budget Category
             {formData.type === 'expense' && (
               <span className="text-xs text-blue-600 isDark:text-blue-400 ml-2">
-                {budgetCategories.length > 0 ? '(Budget categories available)' : '(Add budgets first for expense)'}
+                {budgetCategories.length > 0 ? '(Budget categories available)' : '(Select budgets first for expense)'}
               </span>
             )}
           </label>
