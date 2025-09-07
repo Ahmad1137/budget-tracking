@@ -1,7 +1,12 @@
 import axios from "axios";
 
+const baseURL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_API_URL_PROD
+    : import.meta.env.VITE_API_URL;
+
 const api = axios.create({
-  baseURL: "https://budget-tracking-zlk5.onrender.com",
+  baseURL,
 });
 
 // Add token to requests

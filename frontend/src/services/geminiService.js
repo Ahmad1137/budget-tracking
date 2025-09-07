@@ -8,7 +8,7 @@ try {
   );
 }
 
-const API_KEY = process.env.GEMINI_API_KEY;
+const API_KEY = import.meta.env.GEMINI_API_KEY;
 
 let genAI = null;
 if (API_KEY && GoogleGenerativeAI) {
