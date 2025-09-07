@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://budget-tracking-zlk5.onrender.com",
+  baseURL: process.env.BASE_URL || "http://localhost:5000",
 });
 
 // Add token to requests
