@@ -78,30 +78,30 @@ function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-white isDark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 isDark:border-gray-700 overflow-hidden">
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200'} rounded-2xl shadow-sm border p-8`}>
         <div className="px-6 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-gray-900 isDark:text-white mb-2">Profile Settings</h1>
-            <p className="text-gray-600 isDark:text-gray-400">Update your personal information</p>
+            <h1 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>Profile Settings</h1>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Update your personal information</p>
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 isDark:bg-red-900/20 border border-red-200 isDark:border-red-800 rounded-lg flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-red-600 isDark:text-red-400" />
-              <span className="text-red-700 isDark:text-red-400">{error}</span>
+            <div className={`mb-6 p-4 ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg flex items-center space-x-2`}>
+              <AlertCircle className={`h-5 w-5 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+              <span className={`${isDark ? 'text-red-400' : 'text-red-700'}`}>{error}</span>
             </div>
           )}
           
           {success && (
-            <div className="mb-6 p-4 bg-green-50 isDark:bg-green-900/20 border border-green-200 isDark:border-green-800 rounded-lg flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-green-600 isDark:text-green-400" />
-              <span className="text-green-700 isDark:text-green-400">{success}</span>
+            <div className={`mb-6 p-4 ${isDark ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200'} border rounded-lg flex items-center space-x-2`}>
+              <CheckCircle className={`h-5 w-5 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
+              <span className={`${isDark ? 'text-green-400' : 'text-green-700'}`}>{success}</span>
             </div>
           )}
 
           <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="w-24 h-24 bg-gray-100 isDark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
+              <div className={`w-24 h-24 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} rounded-full flex items-center justify-center overflow-hidden`}>
                 {previewUrl ? (
                   <img
                     src={previewUrl}
@@ -115,7 +115,7 @@ function Profile() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="h-12 w-12 text-gray-400 isDark:text-gray-500" />
+                  <User className={`h-12 w-12 ${isDark ? 'text-gray-500' : 'text-gray-400'}`} />
                 )}
               </div>
               <button
@@ -130,7 +130,7 @@ function Profile() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 <User className="inline h-4 w-4 mr-2" />
                 Full Name
               </label>
@@ -139,14 +139,14 @@ function Profile() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+                className={`w-full px-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
                 placeholder="Enter your full name"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 <Phone className="inline h-4 w-4 mr-2" />
                 Phone Number
               </label>
@@ -155,13 +155,13 @@ function Profile() {
                 name="phoneNumber"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+                className={`w-full px-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
                 placeholder="+1 (555) 123-4567"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 <FileText className="inline h-4 w-4 mr-2" />
                 Bio
               </label>
@@ -170,7 +170,7 @@ function Profile() {
                 value={formData.bio}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors resize-none"
+                className={`w-full px-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none`}
                 placeholder="Tell us about yourself..."
               />
             </div>

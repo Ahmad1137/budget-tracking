@@ -1,4 +1,5 @@
 const Transaction = require("../models/Transaction");
+const Budget = require("../models/Budget");
 const { body, validationResult } = require("express-validator");
 
 // Add Transaction
@@ -8,6 +9,55 @@ const addTransaction = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
 
   try {
+    const { type, category, walletId, amount } = req.body;
+    
+    // Validate wallet-budget relationship for expenses
+    if (type === 'expense' && walletId && category) {
+      const budget = await Budget.findOne({
+        userId: req.user.id,
+        walletId: walletId,
+        category: category,
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1
+      });
+      
+      if (!budget) {
+        return res.status(400).json({ 
+          msg: `No budget found for category '${category}' in this wallet. Please create a budget first.` 
+        });
+      }
+      
+      // Check if expense would exceed budget
+      const existingExpenses = await Transaction.aggregate([
+        {
+          $match: {
+            userId: req.user.id,
+            walletId: walletId,
+            category: category,
+            type: 'expense',
+            date: {
+              $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+              $lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' }
+          }
+        }
+      ]);
+      
+      const currentSpent = existingExpenses.length > 0 ? existingExpenses[0].total : 0;
+      
+      if (currentSpent + amount > budget.amount) {
+        return res.status(400).json({ 
+          msg: `This expense would exceed your budget limit. Budget: $${budget.amount}, Already spent: $${currentSpent}, Remaining: $${budget.amount - currentSpent}` 
+        });
+      }
+    }
+
     const newTransaction = new Transaction({
       ...req.body,
       userId: req.user.id, // From JWT
@@ -15,6 +65,7 @@ const addTransaction = async (req, res) => {
     const transaction = await newTransaction.save();
     res.json(transaction);
   } catch (err) {
+    console.error(err);
     res.status(500).send("Server error");
   }
 };
@@ -45,6 +96,56 @@ const updateTransaction = async (req, res) => {
     if (transaction.userId.toString() !== req.user.id)
       return res.status(401).json({ msg: "Unauthorized" });
 
+    const { type, category, walletId, amount } = req.body;
+    
+    // Validate wallet-budget relationship for expenses
+    if (type === 'expense' && walletId && category) {
+      const budget = await Budget.findOne({
+        userId: req.user.id,
+        walletId: walletId,
+        category: category,
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1
+      });
+      
+      if (!budget) {
+        return res.status(400).json({ 
+          msg: `No budget found for category '${category}' in this wallet. Please create a budget first.` 
+        });
+      }
+      
+      // Check if updated expense would exceed budget (excluding current transaction)
+      const existingExpenses = await Transaction.aggregate([
+        {
+          $match: {
+            userId: req.user.id,
+            walletId: walletId,
+            category: category,
+            type: 'expense',
+            _id: { $ne: transaction._id }, // Exclude current transaction
+            date: {
+              $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+              $lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+            }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' }
+          }
+        }
+      ]);
+      
+      const currentSpent = existingExpenses.length > 0 ? existingExpenses[0].total : 0;
+      
+      if (currentSpent + amount > budget.amount) {
+        return res.status(400).json({ 
+          msg: `This expense would exceed your budget limit. Budget: $${budget.amount}, Already spent: $${currentSpent}, Remaining: $${budget.amount - currentSpent}` 
+        });
+      }
+    }
+
     transaction = await Transaction.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
@@ -52,6 +153,7 @@ const updateTransaction = async (req, res) => {
     );
     res.json(transaction);
   } catch (err) {
+    console.error(err);
     res.status(500).send("Server error");
   }
 };

@@ -1,9 +1,11 @@
 import { Target, AlertTriangle, CheckCircle, DollarSign, Edit, Trash2, MoreVertical } from "lucide-react";
 import { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../utils/api";
 import BudgetForm from "./BudgetForm";
 
 function BudgetList({ budgets, onUpdate }) {
+  const { isDark } = useTheme();
   const [deletingId, setDeletingId] = useState(null);
   const [editingBudget, setEditingBudget] = useState(null);
   const handleDelete = async (budgetId) => {
@@ -23,11 +25,11 @@ function BudgetList({ budgets, onUpdate }) {
   if (budgets.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="bg-gray-100 isDark:bg-gray-700 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className={`${isDark ? 'bg-gray-700' : 'bg-gray-100'} w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4`}>
           <Target className="h-8 w-8 text-gray-400" />
         </div>
-        <h3 className="text-lg font-medium text-gray-500 isDark:text-gray-400 mb-2">No budgets set</h3>
-        <p className="text-gray-500 isDark:text-gray-400">Create your first budget to start tracking</p>
+        <h3 className={`text-lg font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-2`}>No budgets set</h3>
+        <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Create your first budget to start tracking</p>
       </div>
     );
   }
@@ -42,28 +44,28 @@ function BudgetList({ budgets, onUpdate }) {
         return (
           <div
             key={budget._id}
-            className="bg-white isDark:bg-gray-800 rounded-xl p-6 border border-gray-200 isDark:border-gray-700 card-hover"
+            className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-xl p-6 border card-hover`}
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
                 <div className={`p-2 rounded-lg ${
                   isOverBudget 
-                    ? "bg-red-100 isDark:bg-red-900/20" 
+                    ? (isDark ? 'bg-red-900/20' : 'bg-red-100')
                     : isNearLimit 
-                    ? "bg-yellow-100 isDark:bg-yellow-900/20"
-                    : "bg-green-100 isDark:bg-green-900/20"
+                    ? (isDark ? 'bg-yellow-900/20' : 'bg-yellow-100')
+                    : (isDark ? 'bg-green-900/20' : 'bg-green-100')
                 }`}>
                   {isOverBudget ? (
-                    <AlertTriangle className="h-5 w-5 text-red-600 isDark:text-red-400" />
+                    <AlertTriangle className={`h-5 w-5 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
                   ) : isNearLimit ? (
-                    <AlertTriangle className="h-5 w-5 text-yellow-600 isDark:text-yellow-400" />
+                    <AlertTriangle className={`h-5 w-5 ${isDark ? 'text-yellow-400' : 'text-yellow-600'}`} />
                   ) : (
-                    <CheckCircle className="h-5 w-5 text-green-600 isDark:text-green-400" />
+                    <CheckCircle className={`h-5 w-5 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
                   )}
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 isDark:text-white">{budget.category}</h4>
-                  <p className="text-sm text-gray-500 isDark:text-gray-400">
+                  <h4 className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>{budget.category}</h4>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                     {spentPercentage.toFixed(1)}% of budget used
                   </p>
                 </div>
@@ -71,21 +73,21 @@ function BudgetList({ budgets, onUpdate }) {
               
               <div className="flex items-center space-x-2">
                 {isOverBudget && (
-                  <span className="px-3 py-1 bg-red-100 isDark:bg-red-900/20 text-red-700 isDark:text-red-400 text-sm font-medium rounded-full">
+                  <span className={`px-3 py-1 ${isDark ? 'bg-red-900/20 text-red-400' : 'bg-red-100 text-red-700'} text-sm font-medium rounded-full`}>
                     Over Budget
                   </span>
                 )}
                 <div className="flex space-x-1">
                   <button 
                     onClick={() => setEditingBudget(budget)}
-                    className="p-1 hover:bg-gray-100 isDark:hover:bg-gray-700 rounded text-blue-600 isDark:text-blue-400"
+                    className={`p-1 ${isDark ? 'hover:bg-gray-700 text-blue-400' : 'hover:bg-gray-100 text-blue-600'} rounded`}
                   >
                     <Edit className="h-4 w-4" />
                   </button>
                   <button 
                     onClick={() => handleDelete(budget._id)}
                     disabled={deletingId === budget._id}
-                    className="p-1 hover:bg-gray-100 isDark:hover:bg-gray-700 rounded text-red-600 isDark:text-red-400 disabled:opacity-50"
+                    className={`p-1 ${isDark ? 'hover:bg-gray-700 text-red-400' : 'hover:bg-gray-100 text-red-600'} rounded disabled:opacity-50`}
                   >
                     {deletingId === budget._id ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent" />
@@ -99,37 +101,37 @@ function BudgetList({ budgets, onUpdate }) {
             
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div className="text-center">
-                <p className="text-sm text-gray-500 isDark:text-gray-400 mb-1">Budget</p>
-                <p className="font-semibold text-gray-900 isDark:text-white">${budget.amount}</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Budget</p>
+                <p className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>${budget.amount}</p>
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-500 isDark:text-gray-400 mb-1">Spent</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Spent</p>
                 <p className={`font-semibold ${
                   isOverBudget 
-                    ? "text-red-600 isDark:text-red-400" 
-                    : "text-gray-900 isDark:text-white"
+                    ? (isDark ? 'text-red-400' : 'text-red-600')
+                    : (isDark ? 'text-white' : 'text-gray-900')
                 }`}>${budget.spent}</p>
               </div>
               <div className="text-center">
-                <p className="text-sm text-gray-500 isDark:text-gray-400 mb-1">Remaining</p>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-1`}>Remaining</p>
                 <p className={`font-semibold ${
                   budget.remaining < 0 
-                    ? "text-red-600 isDark:text-red-400" 
-                    : "text-green-600 isDark:text-green-400"
+                    ? (isDark ? 'text-red-400' : 'text-red-600')
+                    : (isDark ? 'text-green-400' : 'text-green-600')
                 }`}>${budget.remaining}</p>
               </div>
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500 isDark:text-gray-400">Progress</span>
+                <span className={`${isDark ? 'text-gray-400' : 'text-gray-500'}`}>Progress</span>
                 <span className={`font-medium ${
                   isOverBudget 
-                    ? "text-red-600 isDark:text-red-400" 
-                    : "text-gray-900 isDark:text-white"
+                    ? (isDark ? 'text-red-400' : 'text-red-600')
+                    : (isDark ? 'text-white' : 'text-gray-900')
                 }`}>{spentPercentage.toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-gray-200 isDark:bg-gray-700 rounded-full h-3">
+              <div className={`w-full ${isDark ? 'bg-gray-700' : 'bg-gray-200'} rounded-full h-3`}>
                 <div
                   className={`h-3 rounded-full transition-all duration-300 ${
                     isOverBudget 
@@ -149,8 +151,8 @@ function BudgetList({ budgets, onUpdate }) {
       {/* Edit Budget Modal */}
       {editingBudget && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white isDark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 isDark:text-white mb-4">Edit Budget</h3>
+          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-xl p-6 w-full max-w-md mx-4`}>
+            <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Edit Budget</h3>
             <BudgetForm 
               budget={editingBudget}
               wallets={[]}

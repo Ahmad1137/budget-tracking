@@ -23,8 +23,8 @@ function BudgetsPage() {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState({
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1,
+    year: 'all',
+    month: 'all',
   });
   const [aiSuggestion, setAiSuggestion] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -37,19 +37,17 @@ function BudgetsPage() {
     if (savedSuggestion) {
       setAiSuggestion(savedSuggestion);
     }
-  }, [selectedPeriod]);
+  }, []);
 
   useEffect(() => {
     filterBudgets();
-  }, [budgets, searchTerm, filterStatus]);
+  }, [budgets, searchTerm, filterStatus, selectedPeriod]);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       const [budgetsRes, walletsRes] = await Promise.all([
-        api.get(
-          `/api/budgets?year=${selectedPeriod.year}&month=${selectedPeriod.month}`
-        ),
+        api.get("/api/budgets"),
         api.get("/api/wallets"),
       ]);
       setBudgets(budgetsRes.data);
@@ -66,6 +64,17 @@ function BudgetsPage() {
       budget.category.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // Filter by year
+    if (selectedPeriod.year !== 'all') {
+      filtered = filtered.filter((budget) => budget.year === selectedPeriod.year);
+    }
+
+    // Filter by month
+    if (selectedPeriod.month !== 'all') {
+      filtered = filtered.filter((budget) => budget.month === selectedPeriod.month);
+    }
+
+    // Filter by status
     if (filterStatus !== "all") {
       filtered = filtered.filter((budget) => {
         if (filterStatus === "over") return budget.overBudget;
@@ -143,10 +152,17 @@ function BudgetsPage() {
             Budget Management
           </h1>
           <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {new Date(
-              selectedPeriod.year,
-              selectedPeriod.month - 1
-            ).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+            {selectedPeriod.year === 'all' && selectedPeriod.month === 'all' 
+              ? 'All Time Budgets'
+              : selectedPeriod.year === 'all'
+              ? 'All Years'
+              : selectedPeriod.month === 'all'
+              ? `All Months ${selectedPeriod.year}`
+              : new Date(
+                  selectedPeriod.year,
+                  selectedPeriod.month - 1
+                ).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+            }
           </p>
         </div>
         <div className="flex space-x-4">
@@ -228,23 +244,27 @@ function BudgetsPage() {
         </div>
       </div>
 
-      {/* Period Selector */}
-      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-xl border mb-6`}>
-        <div className="flex flex-wrap gap-4 items-center">
+      {/* Enhanced Filters */}
+      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-6 rounded-xl border mb-6`}>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-4`}>Filter & Search Budgets</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Year Filter */}
           <div>
-            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
               Year
             </label>
             <select
-              value={selectedPeriod.year}
+              value={selectedPeriod.year === 'all' ? 'all' : selectedPeriod.year}
               onChange={(e) =>
                 setSelectedPeriod({
                   ...selectedPeriod,
-                  year: parseInt(e.target.value),
+                  year: e.target.value === 'all' ? 'all' : parseInt(e.target.value),
                 })
               }
-              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg`}
+              className={`w-full px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
+              <option value="all">All Years</option>
               {[2023, 2024, 2025, 2026].map((year) => (
                 <option key={year} value={year}>
                   {year}
@@ -252,20 +272,23 @@ function BudgetsPage() {
               ))}
             </select>
           </div>
+
+          {/* Month Filter */}
           <div>
-            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
               Month
             </label>
             <select
-              value={selectedPeriod.month}
+              value={selectedPeriod.month === 'all' ? 'all' : selectedPeriod.month}
               onChange={(e) =>
                 setSelectedPeriod({
                   ...selectedPeriod,
-                  month: parseInt(e.target.value),
+                  month: e.target.value === 'all' ? 'all' : parseInt(e.target.value),
                 })
               }
-              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg`}
+              className={`w-full px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
+              <option value="all">All Months</option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <option key={month} value={month}>
                   {new Date(2024, month - 1).toLocaleDateString("en-US", {
@@ -274,6 +297,43 @@ function BudgetsPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Status Filter */}
+          <div>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+              Status
+            </label>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              >
+                <option value="all">All Budgets</option>
+                <option value="good">On Track</option>
+                <option value="warning">Near Limit (80%+)</option>
+                <option value="over">Over Budget</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Search */}
+          <div>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+              Search
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search categories..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`w-full pl-10 pr-4 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -289,34 +349,7 @@ function BudgetsPage() {
         </div>
       )}
 
-      {/* Search and Filter */}
-      <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} p-4 rounded-xl border mb-6`}>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search budgets by category..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-4 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-            />
-          </div>
-          <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className={`px-3 py-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-            >
-              <option value="all">All Budgets</option>
-              <option value="good">On Track</option>
-              <option value="warning">Near Limit</option>
-              <option value="over">Over Budget</option>
-            </select>
-          </div>
-        </div>
-      </div>
+
 
       {/* Budget List */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

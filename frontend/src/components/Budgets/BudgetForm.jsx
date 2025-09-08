@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { DollarSign, Tag, Calendar, Wallet, AlertCircle } from "lucide-react";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../utils/api";
 import { useToast } from "../../context/ToastContext";
 import { validateWorkflow, getWorkflowMessages } from "../../utils/validations";
 
 function BudgetForm({ wallets, budget, onAdd, onCancel }) {
+  const { isDark } = useTheme();
   const toast = useToast();
   const [formData, setFormData] = useState({
     category: budget?.category || "",
@@ -147,19 +149,19 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
   };
 
   return (
-    <div className="bg-white isDark:bg-gray-800 rounded-2xl p-6 border border-gray-200 isDark:border-gray-700">
-      <h2 className="text-xl font-semibold text-gray-900 isDark:text-white mb-6">{budget ? 'Edit Budget' : 'Create Budget'}</h2>
+    <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl p-6 border`}>
+      <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>{budget ? 'Edit Budget' : 'Create Budget'}</h2>
       
       {error && (
-        <div className="mb-4 p-4 bg-red-50 isDark:bg-red-900/20 border border-red-200 isDark:border-red-800 rounded-lg flex items-center space-x-2">
-          <AlertCircle className="h-5 w-5 text-red-600 isDark:text-red-400" />
-          <span className="text-red-700 isDark:text-red-400">{error}</span>
+        <div className={`mb-4 p-4 ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg flex items-center space-x-2`}>
+          <AlertCircle className={`h-5 w-5 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+          <span className={`${isDark ? 'text-red-400' : 'text-red-700'}`}>{error}</span>
         </div>
       )}
       
       {!validateWorkflow.hasWallets(wallets) && (
-        <div className="mb-4 p-4 bg-yellow-50 isDark:bg-yellow-900/20 border border-yellow-200 isDark:border-yellow-800 rounded-lg">
-          <p className="text-yellow-800 isDark:text-yellow-200 text-sm">
+        <div className={`mb-4 p-4 ${isDark ? 'bg-yellow-900/20 border-yellow-800' : 'bg-yellow-50 border-yellow-200'} border rounded-lg`}>
+          <p className={`${isDark ? 'text-yellow-200' : 'text-yellow-800'} text-sm`}>
             You need to create at least one wallet before setting up budgets.
           </p>
         </div>
@@ -167,7 +169,7 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">Category</label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Category</label>
           <div className="relative">
             <Tag className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -175,7 +177,7 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               placeholder="e.g., Food, Transportation, Entertainment"
               required
             />
@@ -183,7 +185,7 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">Budget Amount</label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Budget Amount</label>
           <div className="relative">
             <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -192,7 +194,7 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
               value={formData.amount}
               onChange={handleChange}
               step="0.01"
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               placeholder="0.00"
               required
             />
@@ -201,14 +203,14 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
         
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">Year</label>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Year</label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <select
                 name="year"
                 value={formData.year}
                 onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+                className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
                 required
               >
                 {[2023, 2024, 2025, 2026].map(year => (
@@ -219,12 +221,12 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">Month</label>
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Month</label>
             <select
               name="month"
               value={formData.month}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full px-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               required
             >
               {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
@@ -237,9 +239,9 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
         </div>
         
         <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Wallet {!validateWorkflow.hasWallets(wallets) && (
-              <span className="text-xs text-red-600 isDark:text-red-400 ml-2">
+              <span className={`text-xs ${isDark ? 'text-red-400' : 'text-red-600'} ml-2`}>
                 (Create a wallet first)
               </span>
             )}
@@ -250,7 +252,7 @@ function BudgetForm({ wallets, budget, onAdd, onCancel }) {
               name="walletId"
               value={formData.walletId}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               required
             >
               <option value="">Select Wallet</option>

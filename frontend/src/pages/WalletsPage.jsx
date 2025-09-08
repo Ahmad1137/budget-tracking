@@ -39,7 +39,6 @@ function WalletsPage() {
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [walletStats, setWalletStats] = useState({});
-  const [showIncomePrompt, setShowIncomePrompt] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const navigate = useNavigate();
@@ -59,8 +58,17 @@ function WalletsPage() {
         api.get("/api/transactions"),
       ]);
 
-      setWallets(walletsRes.data);
-      setTransactions(transactionsRes.data);
+      const walletsData = Array.isArray(walletsRes.data)
+  ? walletsRes.data
+  : walletsRes.data.wallets || [];
+
+const transactionsData = Array.isArray(transactionsRes.data)
+  ? transactionsRes.data
+  : transactionsRes.data.transactions || [];
+
+setWallets(walletsData);
+setTransactions(transactionsData);
+
 
       // Calculate stats for each wallet
       const stats = {};
@@ -156,14 +164,14 @@ function WalletsPage() {
 
   const handleAddIncome = () => {
     // setSelectedWallet(wallet);
-    // setShowIncomePrompt(true);
+    
     navigate("/transactions"); // Redirect to Add Income page
   };
 
   const handleIncomeAdded = (transaction) => {
     setTransactions([transaction, ...transactions]);
     fetchWallets(); // Refresh wallet stats
-    setShowIncomePrompt(false);
+    
   };
 
   const deleteWallet = async (walletId) => {
@@ -654,7 +662,7 @@ function WalletsPage() {
                       onClick={() => handleAddIncome()}
                       className="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded transition-colors"
                     >
-                      Add Income
+                      Add Balance
                     </button>
                   )}
                 </div>
@@ -664,14 +672,7 @@ function WalletsPage() {
         </div>
       )}
 
-      {/* Income Prompt Modal */}
-      {showIncomePrompt && selectedWallet && (
-        <IncomePrompt
-          wallet={selectedWallet}
-          onIncomeAdded={handleIncomeAdded}
-          onClose={() => setShowIncomePrompt(false)}
-        />
-      )}
+    
     </div>
   );
 }

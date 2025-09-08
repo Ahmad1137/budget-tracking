@@ -69,10 +69,10 @@ function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 isDark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 transition-colors`}>
       <div className="max-w-md w-full">
         <motion.div 
-          className="bg-white isDark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 isDark:border-gray-700 p-8"
+          className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl shadow-sm border p-8`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -80,26 +80,26 @@ function Login() {
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
               <motion.div 
-                className="bg-blue-100 isDark:bg-blue-900/20 p-3 rounded-full"
+                className={`${isDark ? 'bg-blue-900/20' : 'bg-blue-100'} p-3 rounded-full`}
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ duration: 0.2 }}
               >
-                <Wallet className="h-8 w-8 text-blue-600 isDark:text-blue-400" />
+                <Wallet className={`h-8 w-8 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
               </motion.div>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 isDark:text-white mb-2">Welcome back</h2>
-            <p className="text-gray-600 isDark:text-gray-400">Sign in to your account</p>
+            <h2 className={`text-2xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-2`}>Welcome back</h2>
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Sign in to your account</p>
           </div>
 
           {errors.general && (
             <motion.div 
-              className="mb-6 p-4 bg-red-50 isDark:bg-red-900/20 border border-red-200 isDark:border-red-800 rounded-lg flex items-center space-x-2"
+              className={`mb-6 p-4 ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg flex items-center space-x-2`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <AlertCircle className="h-5 w-5 text-red-600 isDark:text-red-400" />
-              <span className="text-red-700 isDark:text-red-400">{errors.general}</span>
+              <AlertCircle className={`h-5 w-5 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+              <span className={`${isDark ? 'text-red-400' : 'text-red-700'}`}>{errors.general}</span>
             </motion.div>
           )}
 
@@ -109,7 +109,7 @@ function Login() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
-              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Email address
               </label>
               <div className="relative">
@@ -119,8 +119,8 @@ function Login() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
-                    errors.email ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} transition-colors ${
+                    errors.email ? (isDark ? 'border-red-400' : 'border-red-500') : (isDark ? 'border-gray-600' : 'border-gray-300')
                   }`}
                   placeholder="Enter your email"
                   required
@@ -128,7 +128,7 @@ function Login() {
               </div>
               {errors.email && (
                 <motion.p 
-                  className="mt-1 text-sm text-red-600 isDark:text-red-400"
+                  className={`mt-1 text-sm ${isDark ? 'text-red-400' : 'text-red-600'}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
@@ -143,7 +143,7 @@ function Login() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.2 }}
             >
-              <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Password
               </label>
               <div className="relative">
@@ -153,8 +153,8 @@ function Login() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors ${
-                    errors.password ? "border-red-500 isDark:border-red-400" : "border-gray-300 isDark:border-gray-600"
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${isDark ? 'bg-gray-700 text-white' : 'bg-white text-gray-900'} transition-colors ${
+                    errors.password ? (isDark ? 'border-red-400' : 'border-red-500') : (isDark ? 'border-gray-600' : 'border-gray-300')
                   }`}
                   placeholder="Enter your password"
                   required
@@ -162,7 +162,7 @@ function Login() {
                 <motion.button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 isDark:hover:text-gray-300"
+                  className={`absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 ${isDark ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -171,7 +171,7 @@ function Login() {
               </div>
               {errors.password && (
                 <motion.p 
-                  className="mt-1 text-sm text-red-600 isDark:text-red-400"
+                  className={`mt-1 text-sm ${isDark ? 'text-red-400' : 'text-red-600'}`}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
@@ -210,7 +210,7 @@ function Login() {
           >
             <button
               onClick={() => setShowForgotPassword(true)}
-              className="text-blue-600 isDark:text-blue-400 hover:text-blue-500 text-sm font-medium"
+              className={`${isDark ? 'text-blue-400' : 'text-blue-600'} hover:text-blue-500 text-sm font-medium`}
             >
               Forgot your password?
             </button>
@@ -222,9 +222,9 @@ function Login() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.4 }}
           >
-            <p className="text-gray-600 isDark:text-gray-400">
+            <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Don't have an account?{" "}
-              <Link to="/register" className="text-blue-600 isDark:text-blue-400 hover:text-blue-500 font-medium">
+              <Link to="/register" className={`${isDark ? 'text-blue-400' : 'text-blue-600'} hover:text-blue-500 font-medium`}>
                 Sign up
               </Link>
             </p>

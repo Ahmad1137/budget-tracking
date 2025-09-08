@@ -2,12 +2,14 @@ import { useState, useContext, useEffect, useCallback } from "react";
 import { DollarSign, Tag, FileText, Calendar, Wallet, AlertCircle, CheckCircle, Sparkles } from "lucide-react";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import { useToast } from "../../context/ToastContext";
 import { validateWorkflow, getWorkflowMessages } from "../../utils/validations";
 import { generateTransactionDescription } from "../../services/geminiService";
 
 function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] }) {
   const { } = useContext(AuthContext);
+  const { isDark } = useTheme();
   const toast = useToast();
   const [formData, setFormData] = useState({
     type: "expense",
@@ -199,32 +201,36 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
     }
   };
 
-  const budgetCategories = budgets ? budgets.map(b => b.category) : [];
-  const defaultCategories = {
+  // Filter budget categories based on selected wallet
+  const walletBudgetCategories = budgets ? 
+    budgets
+      .filter(b => !formData.walletId || b.walletId === formData.walletId)
+      .map(b => b.category) : [];
   
+  const defaultCategories = {
     income: ['Salary', 'Freelance', 'Investment', 'Gift', 'Other']
   };
   
   const categories = {
-    expense: budgetCategories.length > 0 ? [...new Set([...budgetCategories])] : [''],
+    expense: walletBudgetCategories.length > 0 ? [...new Set([...walletBudgetCategories])] : [],
     income: defaultCategories.income
   };
 
   return (
-    <div className="bg-white isDark:bg-gray-800 rounded-2xl p-6 border border-gray-200 isDark:border-gray-700">
-      <h2 className="text-xl font-semibold text-gray-900 isDark:text-white mb-6">Add Transaction</h2>
+    <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-2xl p-6 border`}>
+      <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'} mb-6`}>Add Transaction</h2>
       
       {error && (
-        <div className="mb-4 p-4 bg-red-50 isDark:bg-red-900/20 border border-red-200 isDark:border-red-800 rounded-lg flex items-center space-x-2">
-          <AlertCircle className="h-5 w-5 text-red-600 isDark:text-red-400" />
-          <span className="text-red-700 isDark:text-red-400">{error}</span>
+        <div className={`mb-4 p-4 ${isDark ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'} border rounded-lg flex items-center space-x-2`}>
+          <AlertCircle className={`h-5 w-5 ${isDark ? 'text-red-400' : 'text-red-600'}`} />
+          <span className={`${isDark ? 'text-red-400' : 'text-red-700'}`}>{error}</span>
         </div>
       )}
       
       {success && (
-        <div className="mb-4 p-4 bg-green-50 isDark:bg-green-900/20 border border-green-200 isDark:border-green-800 rounded-lg flex items-center space-x-2">
-          <CheckCircle className="h-5 w-5 text-green-600 isDark:text-green-400" />
-          <span className="text-green-700 isDark:text-green-400">{success}</span>
+        <div className={`mb-4 p-4 ${isDark ? 'bg-green-900/20 border-green-800' : 'bg-green-50 border-green-200'} border rounded-lg flex items-center space-x-2`}>
+          <CheckCircle className={`h-5 w-5 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
+          <span className={`${isDark ? 'text-green-400' : 'text-green-700'}`}>{success}</span>
         </div>
       )}
       
@@ -235,8 +241,8 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
             onClick={() => setFormData({ ...formData, type: "expense" })}
             className={`p-3 rounded-lg border-2 transition-colors ${
               formData.type === "expense"
-                ? "border-red-500 bg-red-50 isDark:bg-red-900/20 text-red-700 isDark:text-red-400"
-                : "border-gray-200 isDark:border-gray-600 text-gray-600 isDark:text-gray-400 hover:border-red-300"
+                ? `border-red-500 ${isDark ? 'bg-red-900/20 text-red-400' : 'bg-red-50 text-red-700'}`
+                : `${isDark ? 'border-gray-600 text-gray-400' : 'border-gray-200 text-gray-600'} hover:border-red-300`
             }`}
           >
             Expense
@@ -246,8 +252,8 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
             onClick={() => setFormData({ ...formData, type: "income" })}
             className={`p-3 rounded-lg border-2 transition-colors ${
               formData.type === "income"
-                ? "border-green-500 bg-green-50 isDark:bg-green-900/20 text-green-700 isDark:text-green-400"
-                : "border-gray-200 isDark:border-gray-600 text-gray-600 isDark:text-gray-400 hover:border-green-300"
+                ? `border-green-500 ${isDark ? 'bg-green-900/20 text-green-400' : 'bg-green-50 text-green-700'}`
+                : `${isDark ? 'border-gray-600 text-gray-400' : 'border-gray-200 text-gray-600'} hover:border-green-300`
             }`}
           >
             Income
@@ -255,7 +261,7 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Amount
           </label>
           <div className="relative">
@@ -266,19 +272,55 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
               value={formData.amount}
               onChange={handleChange}
               step="0.01"
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               placeholder="0.00"
               required
             />
           </div>
         </div>
-
+  <div>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            Wallet {!validateWorkflow.hasWallets(wallets) && (
+              <span className={`text-xs ${isDark ? 'text-red-400' : 'text-red-600'} ml-2`}>
+                (Create a wallet first)
+              </span>
+            )}
+          </label>
+          <div className="relative">
+            <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <select
+              name="walletId"
+              value={formData.walletId}
+              onChange={handleChange}
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
+              required
+            >
+              <option value="">Select Wallet</option>
+              {wallets && wallets.map((wallet) => (
+                <option key={wallet._id} value={wallet._id}>
+                  {wallet.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {!validateWorkflow.hasWallets(wallets) && (
+            <p className={`text-xs ${isDark ? 'text-red-400' : 'text-red-600'} mt-1`}>
+              You need to create at least one wallet before adding transactions.
+            </p>
+          )}
+        </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
-          Budget Category
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
+            Category
             {formData.type === 'expense' && (
-              <span className="text-xs text-blue-600 isDark:text-blue-400 ml-2">
-                {budgetCategories.length > 0 ? '(Budget categories available)' : '(Select budgets first for expense)'}
+              <span className={`text-xs ${isDark ? 'text-blue-400' : 'text-blue-600'} ml-2`}>
+                {formData.walletId ? 
+                  (walletBudgetCategories.length > 0 ? 
+                    `(${walletBudgetCategories.length} budget categories available)` : 
+                    '(No budgets for this wallet - create budgets first)'
+                  ) : 
+                  '(Select wallet first)'
+                }
               </span>
             )}
           </label>
@@ -288,27 +330,31 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
               required
             >
               <option value="">Select category</option>
-              {categories[formData.type].map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
+              {formData.type === 'expense' && !formData.walletId ? (
+                <option disabled>Select wallet first</option>
+              ) : (
+                categories[formData.type].map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))
+              )}
             </select>
           </div>
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300">
+            <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               Description (optional)
             </label>
             <button
               type="button"
               onClick={generateAiDescription}
               disabled={!formData.category || !formData.amount || aiLoading}
-              className="flex items-center space-x-1 text-xs text-blue-600 isDark:text-blue-400 hover:text-blue-700 isDark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`flex items-center space-x-1 text-xs ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'} disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {aiLoading ? (
                 <div className="animate-spin h-3 w-3 border border-blue-600 border-t-transparent rounded-full" />
@@ -325,14 +371,14 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors resize-none"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none`}
               placeholder="Add a note about this transaction..."
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
             Date
           </label>
           <div className="relative">
@@ -342,42 +388,12 @@ function TransactionForm({ wallets = [], budgets = [], onAdd, transactions = [] 
               name="date"
               value={formData.date}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
+              className={`w-full pl-10 pr-4 py-3 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors`}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 isDark:text-gray-300 mb-2">
-            Wallet {!validateWorkflow.hasWallets(wallets) && (
-              <span className="text-xs text-red-600 isDark:text-red-400 ml-2">
-                (Create a wallet first)
-              </span>
-            )}
-          </label>
-          <div className="relative">
-            <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <select
-              name="walletId"
-              value={formData.walletId}
-              onChange={handleChange}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 isDark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white isDark:bg-gray-700 text-gray-900 isDark:text-white transition-colors"
-              required
-            >
-              <option value="">Select Wallet</option>
-              {wallets && wallets.map((wallet) => (
-                <option key={wallet._id} value={wallet._id}>
-                  {wallet.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {!validateWorkflow.hasWallets(wallets) && (
-            <p className="text-xs text-red-600 isDark:text-red-400 mt-1">
-              You need to create at least one wallet before adding transactions.
-            </p>
-          )}
-        </div>
+      
 
         <button
           type="submit"

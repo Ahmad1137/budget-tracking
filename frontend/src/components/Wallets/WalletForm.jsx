@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../utils/api";
 
 function WalletForm({ onAdd, onCancel }) {
+  const { isDark } = useTheme();
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -24,28 +26,28 @@ function WalletForm({ onAdd, onCancel }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Create Wallet</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
+    <div className={`max-w-md mx-auto p-6 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} rounded-lg shadow-md border`}>
+      <h2 className={`text-2xl font-bold mb-6 text-center ${isDark ? 'text-white' : 'text-gray-900'}`}>Create Wallet</h2>
+      {error && <p className={`${isDark ? 'text-red-400' : 'text-red-500'} mb-4`}>{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium">Name</label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Name</label>
           <input
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full p-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-medium">Description</label>
+          <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Description</label>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full p-2 border ${isDark ? 'border-gray-600 bg-gray-700 text-white' : 'border-gray-300 bg-white text-gray-900'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
           ></textarea>
         </div>
         <div className="flex space-x-3">
